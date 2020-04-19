@@ -1,3 +1,4 @@
+import math
 from typing import List
 
 from projectile.Position import Position
@@ -12,14 +13,18 @@ R = 8.31447
 
 
 class Environment:
-    std_pressure = 101325.0
-    std_temp = 288.15
-    gravity_acc = 9.80665
-    # gravity acceleration can also be calculated (depends on height, distance from center of mass-see NewtonianGravity)
-    temp_lapse_rate = 0.0065
-    molar_mass = 0.0289654
 
-    forces: List[Force] = [NewtonianGravity(), DragForce()]
+    """
+    Gravity must always be on the same place in the list of forces because other forces (e.g. drag) may depend on it.
+    """
+    GRAVITY_FORCE_INDEX = 0
+
+    def __init__(self, std_pressure=101325.0, std_temp=288.15, temp_lapse_rate=lambda h: 0.0065, molar_mass=0.0289654):
+        self.std_pressure = std_pressure
+        self.std_temp = std_temp
+        self.temp_lapse_rate = temp_lapse_rate
+        self.molar_mass = molar_mass
+        self.forces: List[Force] = [NewtonianGravity(), DragForce()]
 
     def add_force(self, force: Force) -> None:
         self.forces.append(force)
@@ -28,10 +33,12 @@ class Environment:
         self.forces.remove(force)
 
     def density(self, altitude: float) -> float:
-        """Works only for troposphere (~18km), uses const g"""
+        """Works only for troposphere (~18km); temperature lapse rate is by default constant"""
+        dummy = Projectile(self, 1, [0, 0, 0], Position(0, 0, altitude))
+        g = math.fabs(self.forces[Environment.GRAVITY_FORCE_INDEX].get_z(dummy, self))
         return (self.std_pressure * self.molar_mass) / (R * self.std_temp) * \
-               (1 - (self.temp_lapse_rate*altitude)/self.std_temp) ** \
-               (self.gravity_acc * self.molar_mass / (R*self.temp_lapse_rate) - 1)
+               (1 - (self.temp_lapse_rate(altitude)*altitude)/self.std_temp) ** \
+               (g * self.molar_mass / (R*self.temp_lapse_rate(altitude)) - 1)
 
     def get_forces_intensity(self, projectile) -> List[float]:
         intensities = [0.0, 0.0, 0.0]
