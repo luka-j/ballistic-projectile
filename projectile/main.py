@@ -1,19 +1,25 @@
 import math
+from typing import TextIO
 
 from projectile.Environment import Environment
 from projectile.Position import Position
+from projectile.Projectile import Projectile
 
-DT = 10**-2
+
+def launch_projectile(projectile: Projectile, pitch: float, yaw: float, velocity: float,
+                      outfile: TextIO, dt: float):
+    projectile.launch_at_angle(pitch, yaw, velocity)
+    while True:
+        projectile.advance(dt)
+        projectile.write_position(outfile)
+        if projectile.has_hit_ground():
+            break
+
 
 if __name__ == '__main__':
     env = Environment()
     projectile = env.create_projectile(1, Position(0, 0, 0))
-    projectile.launch_at_angle(math.pi/6, 0, 10.0)
     output = open("/home/luka/Documents/mehanika-seminarski/test.out", "w")
-    while True:
-        projectile.advance(DT)
-        projectile.write_position(output)
-        if projectile.has_hit_ground():
-            break
-
+    launch_projectile(projectile, math.pi / 6, 0, 10.0, output, 10**-2)
+    output.close()
     print("Finished!")
