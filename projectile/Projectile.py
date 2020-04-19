@@ -18,6 +18,7 @@ class Projectile:
         self.drag_coef = drag_coef
         self.environment = environment
         self.directions = np.zeros(3)
+        self.time = 0
 
     def launch_at_angle(self, pitch: float, yaw: float, velocity: float):
         self.velocities[X_INDEX] = velocity * np.cos(yaw) * np.cos(pitch)
@@ -40,9 +41,10 @@ class Projectile:
         self.position.x += self.velocities[X_INDEX] * dt
         self.position.y += self.velocities[Y_INDEX] * dt
         self.position.z += self.velocities[Z_INDEX] * dt
+        self.time += dt
 
     def has_hit_ground(self):
         return self.position.z <= 0
 
     def write_position(self, f: TextIO):
-        f.write("{},{},{}\n".format(self.position.x, self.position.y, self.position.z))
+        f.write("{:.4f},{},{},{}\n".format(self.time, self.position.x, self.position.y, self.position.z))
