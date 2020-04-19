@@ -2,12 +2,13 @@ from typing import List
 
 from projectile.Position import Position
 from projectile.forces.Force import Force
-from projectile.forces.NormalGravity import NormalGravity
+from projectile.forces.NewtonianGravity import NewtonianGravity
+from projectile.forces.SimpleGravity import SimpleGravity
 from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
 
 
 class Environment:
-    forces: List[Force] = [NormalGravity()]
+    forces: List[Force] = [NewtonianGravity()]
 
     def add_force(self, force: Force) -> None:
         self.forces.append(force)

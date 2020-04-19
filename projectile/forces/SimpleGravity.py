@@ -1,7 +1,7 @@
 from projectile.forces.Force import Force
 
 
-class NormalGravity(Force):
+class SimpleGravity(Force):
     """
     Defines normal, crude gravity. Assume gravity has constant acceleration in z-direction
     """
