@@ -2,6 +2,7 @@ import math
 from typing import List, Callable
 
 from projectile.Position import Position
+from projectile.forces.CentrifugalForce import CentrifugalForce
 from projectile.forces.CoriolisForce import CoriolisForce
 from projectile.forces.DragForce import DragForce
 from projectile.forces.EotvosForce import EotvosForce
@@ -29,7 +30,7 @@ class Environment:
         self.std_temp = std_temp
         self.temp_lapse_rate = temp_lapse_rate
         self.molar_mass = molar_mass
-        self.forces: List[Force] = [NewtonianGravity(), DragForce(), CoriolisForce(), EotvosForce()]
+        self.forces: List[Force] = [NewtonianGravity(), DragForce(), CoriolisForce(), EotvosForce(), CentrifugalForce()]
 
     def add_force(self, force: Force) -> None:
         self.forces.append(force)
