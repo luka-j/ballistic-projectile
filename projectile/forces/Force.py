@@ -12,6 +12,7 @@ class Force:
     def __init__(self, x: Callable[[Projectile, Environment], float],
                  y: Callable[[Projectile, Environment], float],
                  z: Callable[[Projectile, Environment], float]):
+        self.intensity = [None, None, None]
         self.intensity[X_INDEX] = x
         self.intensity[Y_INDEX] = y
         self.intensity[Z_INDEX] = z

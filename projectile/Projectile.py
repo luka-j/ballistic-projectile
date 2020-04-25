@@ -21,6 +21,7 @@ class Projectile:
         self.directions = np.zeros(3)
         self.time = 0
         self.distance_travelled = 0
+        self.total_velocity = 0
 
     def launch_at_angle(self, pitch: float, yaw: float, velocity: float):
         self.velocities[X_INDEX] = velocity * np.cos(yaw) * np.cos(pitch)
@@ -32,13 +33,11 @@ class Projectile:
         self.velocities[Y_INDEX] = vy
         self.velocities[Z_INDEX] = vz
 
-    def velocity(self):
-        return np.sqrt(np.sum(self.velocities ** 2))
-
     def advance(self, dt):
         forces = self.environment.get_forces_intensity(self)
         acc = np.divide(forces, self.mass(self.time))
         self.velocities += acc * dt
+        self.total_velocity = np.sqrt(np.sum(self.velocities ** 2))
         self.directions = np.sign(self.velocities)
         movements = self.velocities * dt
 

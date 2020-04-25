@@ -2,7 +2,9 @@ import math
 from typing import List, Callable
 
 from projectile.Position import Position
+from projectile.forces.CoriolisForce import CoriolisForce
 from projectile.forces.DragForce import DragForce
+from projectile.forces.EotvosForce import EotvosForce
 from projectile.forces.Force import Force
 from projectile.forces.NewtonianGravity import NewtonianGravity
 from projectile.Projectile import Projectile
@@ -19,14 +21,15 @@ class Environment:
     """
     GRAVITY_FORCE_INDEX = 0
 
-    def __init__(self, earth_radius=6378137, std_pressure=101325.0, std_temp=288.15, temp_lapse_rate=lambda h: 0.0065,
-                 molar_mass=0.0289654):
+    def __init__(self, earth_radius=6378137, earth_angular_velocity=7.292115e-5, std_pressure=101325.0, std_temp=288.15,
+                 temp_lapse_rate=lambda h: 0.0065, molar_mass=0.0289654):
         self.earth_radius = earth_radius
+        self.earth_angular_velocity = earth_angular_velocity
         self.std_pressure = std_pressure
         self.std_temp = std_temp
         self.temp_lapse_rate = temp_lapse_rate
         self.molar_mass = molar_mass
-        self.forces: List[Force] = [NewtonianGravity(), DragForce()]
+        self.forces: List[Force] = [NewtonianGravity(), DragForce(), CoriolisForce(), EotvosForce()]
 
     def add_force(self, force: Force) -> None:
         self.forces.append(force)
