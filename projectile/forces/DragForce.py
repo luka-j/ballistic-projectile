@@ -6,7 +6,7 @@ from projectile.forces.Force import Force
 
 # noinspection PyUnresolvedReferences
 def intensity(projectile: Projectile, environment: Environment):
-    return 0.5 * environment.density(projectile.position.z) * projectile.velocity()**2 * \
+    return 0.5 * environment.density(projectile.position.alt) * projectile.velocity() ** 2 * \
            projectile.cross_section() * projectile.drag_coef()
 
 

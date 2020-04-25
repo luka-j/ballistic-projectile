@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from typing import List, TextIO, Callable
+from typing import List, TextIO
 from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.Position import Position
 import numpy as np
+from math import cos, sin, pi
 
 
 class Projectile:
     def __init__(self, environment: Environment, mass: float, initial_velocities: List[float],
                  initial_position: Position, cross_section=lambda: 0.25, drag_coef=lambda: 0.05):
         if initial_position is None:
-            initial_position = Position(0, 0, 0)
+            initial_position = Position(44.869389, 20.640221, 0)
         self.mass = mass
         self.velocities = np.array(initial_velocities, "float64")
         self.position = initial_position
@@ -19,6 +20,7 @@ class Projectile:
         self.environment = environment
         self.directions = np.zeros(3)
         self.time = 0
+        self.distance_travelled = 0
 
     def launch_at_angle(self, pitch: float, yaw: float, velocity: float):
         self.velocities[X_INDEX] = velocity * np.cos(yaw) * np.cos(pitch)
@@ -38,13 +40,20 @@ class Projectile:
         acc = np.divide(forces, self.mass)
         self.velocities += acc * dt
         self.directions = np.sign(self.velocities)
-        self.position.x += self.velocities[X_INDEX] * dt
-        self.position.y += self.velocities[Y_INDEX] * dt
-        self.position.z += self.velocities[Z_INDEX] * dt
+
+        radius = self.environment.earth_radius+self.position.alt
+        dlat = (self.velocities[Y_INDEX]*dt)/radius
+        dlon = self.velocities[X_INDEX]/(radius*cos(pi*self.position.lat/180))
+        self.position.lat += dlat * 180/pi
+        self.position.lon += dlon * 180/pi
+        self.position.alt += self.velocities[Z_INDEX] * dt
+
         self.time += dt
+        self.distance_travelled += np.sum((self.velocities*dt)**2)
 
     def has_hit_ground(self):
-        return self.position.z <= 0
+        return self.position.alt <= 0
 
     def write_position(self, f: TextIO):
-        f.write("{:.4f},{},{},{}\n".format(self.time, self.position.x, self.position.y, self.position.z))
+        f.write("{:.4f},{:.2f},{},{},{}\n".format(self.time, self.distance_travelled,
+                                                  self.position.lat, self.position.lon, self.position.alt))

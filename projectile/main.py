@@ -18,8 +18,8 @@ def launch_projectile(projectile: Projectile, pitch: float, yaw: float, velocity
 
 if __name__ == '__main__':
     env = Environment()
-    projectile = env.create_projectile(1, Position(0, 0, 0))
+    projectile = env.create_projectile(1, Position(44.869389, 20.640221, 0))
     output = open("/home/luka/Documents/mehanika-seminarski/test.out", "w")
-    launch_projectile(projectile, math.pi / 4, 0, 10.0, output, 10**-2)
+    launch_projectile(projectile, math.pi / 4, math.pi/8, 100.0, output, 10**-2)
     output.close()
     print("Finished!")

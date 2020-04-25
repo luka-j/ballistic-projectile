@@ -19,7 +19,9 @@ class Environment:
     """
     GRAVITY_FORCE_INDEX = 0
 
-    def __init__(self, std_pressure=101325.0, std_temp=288.15, temp_lapse_rate=lambda h: 0.0065, molar_mass=0.0289654):
+    def __init__(self, earth_radius=6378137, std_pressure=101325.0, std_temp=288.15, temp_lapse_rate=lambda h: 0.0065,
+                 molar_mass=0.0289654):
+        self.earth_radius = earth_radius
         self.std_pressure = std_pressure
         self.std_temp = std_temp
         self.temp_lapse_rate = temp_lapse_rate
