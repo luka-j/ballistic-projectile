@@ -49,7 +49,7 @@ class Projectile:
         self.position.alt += self.velocities[Z_INDEX] * dt
 
         self.time += dt
-        self.distance_travelled += np.sum((self.velocities*dt)**2)
+        self.distance_travelled += np.sqrt(np.sum((self.velocities*dt)**2))
 
     def has_hit_ground(self):
         return self.position.alt <= 0
