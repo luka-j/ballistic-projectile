@@ -4,7 +4,7 @@ from typing import List, TextIO, Callable
 from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.Position import Position
 import numpy as np
-from math import cos, sin, pi
+from math import cos, sin, pi, atan2, asin
 
 
 class Projectile:
@@ -40,16 +40,24 @@ class Projectile:
         acc = np.divide(forces, self.mass(self.time))
         self.velocities += acc * dt
         self.directions = np.sign(self.velocities)
+        movements = self.velocities * dt
 
         radius = self.environment.earth_radius+self.position.alt
-        dlat = (self.velocities[Y_INDEX]*dt)/radius
-        dlon = self.velocities[X_INDEX]/(radius*cos(pi*self.position.lat/180))
-        self.position.lat += dlat * 180/pi
-        self.position.lon += dlon * 180/pi
+        angle = atan2(movements[Y_INDEX], movements[X_INDEX])
+        distance_m = np.sqrt(movements[X_INDEX]**2 + movements[Y_INDEX]**2)
+        distance_rad = distance_m / radius
+
+        old_lat = self.position.lat
+        self.position.lat = asin(sin(self.position.lat) * cos(distance_rad) +
+                                 cos(self.position.lat) * sin(distance_rad) * cos(angle))
+        self.directions[Y_INDEX] = np.sign(self.position.lat - old_lat)
+        if cos(self.position.lat) != 0:
+            self.position.lon = divmod(self.position.lon-asin(sin(angle)*sin(distance_rad)/cos(self.position.lat))+pi,
+                                       2*pi)[1] - pi
         self.position.alt += self.velocities[Z_INDEX] * dt
 
         self.time += dt
-        self.distance_travelled += np.sqrt(np.sum((self.velocities*dt)**2))
+        self.distance_travelled += distance_m
 
     def has_hit_ground(self):
         return self.position.alt <= 0
