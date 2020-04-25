@@ -7,4 +7,4 @@ class SimpleGravity(Force):
     """
     def __init__(self):
         self.intensity = [0, 0, 0]
-        super().__init__(lambda pr, env: 0, lambda pr, env: 0, lambda pr, env: -9.81*pr.mass)
+        super().__init__(lambda pr, env: 0, lambda pr, env: 0, lambda pr, env: -9.81*pr.mass(pr.time))

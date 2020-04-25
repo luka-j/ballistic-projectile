@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, TextIO
+from typing import List, TextIO, Callable
 from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.Position import Position
 import numpy as np
@@ -8,7 +8,7 @@ from math import cos, sin, pi
 
 
 class Projectile:
-    def __init__(self, environment: Environment, mass: float, initial_velocities: List[float],
+    def __init__(self, environment: Environment, mass: Callable[[float], float], initial_velocities: List[float],
                  initial_position: Position, cross_section=lambda: 0.25, drag_coef=lambda: 0.05):
         if initial_position is None:
             initial_position = Position(44.869389, 20.640221, 0)
@@ -37,7 +37,7 @@ class Projectile:
 
     def advance(self, dt):
         forces = self.environment.get_forces_intensity(self)
-        acc = np.divide(forces, self.mass)
+        acc = np.divide(forces, self.mass(self.time))
         self.velocities += acc * dt
         self.directions = np.sign(self.velocities)
 

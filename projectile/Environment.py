@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import List, Callable
 
 from projectile.Position import Position
 from projectile.forces.DragForce import DragForce
@@ -36,7 +36,7 @@ class Environment:
 
     def density(self, altitude: float) -> float:
         """Works only for troposphere (~18km); temperature lapse rate is by default constant"""
-        dummy = Projectile(self, 1, [0, 0, 0], Position(0, 0, altitude))
+        dummy = Projectile(self, lambda t: 1, [0, 0, 0], Position(0, 0, altitude))
         g = math.fabs(self.forces[Environment.GRAVITY_FORCE_INDEX].get_z(dummy, self))
         return (self.std_pressure * self.molar_mass) / (R * self.std_temp) * \
                (1 - (self.temp_lapse_rate(altitude)*altitude)/self.std_temp) ** \
@@ -50,6 +50,6 @@ class Environment:
             intensities[Z_INDEX] += force.get_z(projectile, self)
         return intensities
 
-    def create_projectile(self, mass: float, initial_position: Position, cross_section=lambda: 0.25,
+    def create_projectile(self, mass: Callable[[float], float], initial_position: Position, cross_section=lambda: 0.25,
                           drag_coef=lambda: 0.05) -> Projectile:
         return Projectile(self, mass, [0, 0, 0], initial_position, cross_section, drag_coef)
