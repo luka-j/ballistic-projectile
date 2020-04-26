@@ -5,6 +5,7 @@ from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.Position import Position
 import numpy as np
 from math import cos, sin, pi, atan2, asin
+from projectile.util import sgn
 
 
 class Projectile:
@@ -49,7 +50,7 @@ class Projectile:
         old_lat = self.position.lat
         self.position.lat = asin(sin(self.position.lat) * cos(distance_rad) +
                                  cos(self.position.lat) * sin(distance_rad) * cos(angle))
-        self.directions[Y_INDEX] = np.sign(self.position.lat - old_lat)
+        self.directions[Y_INDEX] = sgn(self.position.lat - old_lat)
         if cos(self.position.lat) != 0:
             self.position.lon = divmod(self.position.lon-asin(sin(angle)*sin(distance_rad)/cos(self.position.lat))+pi,
                                        2*pi)[1] - pi
