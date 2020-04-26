@@ -11,7 +11,8 @@ from projectile.util import sgn
 
 class Projectile:
     def __init__(self, environment: Environment, mass: float, initial_velocities: List[float],
-                 initial_position: Position, cross_section=lambda: 0.25, drag_coef=lambda: 0.1):
+                 initial_position: Position, cross_section=lambda pitch, yaw: 0.25, drag_coef=lambda pitch, yaw: 0.1,
+                 surface_altitude=lambda pos: 0):
         if initial_position is None:
             initial_position = Position(44.869389, 20.640221, 0)
         self.initial_mass = mass
@@ -19,6 +20,7 @@ class Projectile:
         self.position = initial_position
         self.cross_section = cross_section
         self.drag_coef = drag_coef
+        self.surface_altitude = surface_altitude
         self.environment = environment
         self.directions = np.zeros(3)
         self.time = 0
@@ -75,8 +77,8 @@ class Projectile:
         self.directions[Y_INDEX] = sgn(self.position.lat - old_lat)
         if cos(self.position.lat) != 0:
             self.position.lon = \
-            divmod(self.position.lon - asin(sin(self.yaw) * sin(distance_rad) / cos(self.position.lat)) + pi,
-                   2 * pi)[1] - pi
+                divmod(self.position.lon - asin(sin(self.yaw) * sin(distance_rad) / cos(self.position.lat)) + pi,
+                       2 * pi)[1] - pi
         self.position.alt += self.velocities[Z_INDEX] * dt
 
         self.time += dt
@@ -86,7 +88,7 @@ class Projectile:
         return self.initial_mass - self.lost_mass
 
     def has_hit_ground(self):
-        return self.position.alt <= 0
+        return self.position.alt <= self.surface_altitude(self.position)
 
     def write_position(self, f: TextIO):
         if not self.written_header:
