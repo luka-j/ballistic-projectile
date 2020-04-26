@@ -28,6 +28,7 @@ class Projectile:
         self.pitch = 0
         self.yaw = 0
         self.dt = 0
+        self.written_header = False
 
     def launch_at_angle(self, pitch: float, yaw: float, velocity: float) -> None:
         self.pitch = pitch
@@ -40,7 +41,7 @@ class Projectile:
         self.velocities[X_INDEX] = vx
         self.velocities[Y_INDEX] = vy
         self.velocities[Z_INDEX] = vz
-        self.pitch = atan2(vz, sqrt(vx**2+vy**2))
+        self.pitch = atan2(vz, sqrt(vx ** 2 + vy ** 2))
         self.yaw = atan2(vy, vx)
 
     def add_thrust(self, thrust: ThrustForce) -> None:
@@ -57,14 +58,15 @@ class Projectile:
         forces = self.environment.get_forces_intensity(self)
         acc = np.divide(forces, self.mass())
         self.velocities += acc * dt
-        self.pitch = atan2(self.velocities[Z_INDEX], sqrt(self.velocities[X_INDEX]**2+self.velocities[Y_INDEX]**2))
+        self.pitch = atan2(self.velocities[Z_INDEX],
+                           sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
         self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
         self.total_velocity = np.sqrt(np.sum(self.velocities ** 2))
         self.directions = np.sign(self.velocities)
         movements = self.velocities * dt
 
-        radius = self.environment.earth_radius+self.position.alt
-        distance_m = np.sqrt(movements[X_INDEX]**2 + movements[Y_INDEX]**2)
+        radius = self.environment.earth_radius + self.position.alt
+        distance_m = np.sqrt(movements[X_INDEX] ** 2 + movements[Y_INDEX] ** 2)
         distance_rad = distance_m / radius
 
         old_lat = self.position.lat
@@ -72,8 +74,9 @@ class Projectile:
                                  cos(self.position.lat) * sin(distance_rad) * cos(self.yaw))
         self.directions[Y_INDEX] = sgn(self.position.lat - old_lat)
         if cos(self.position.lat) != 0:
-            self.position.lon = divmod(self.position.lon-asin(sin(self.yaw)*sin(distance_rad)/cos(self.position.lat))+pi,
-                                       2*pi)[1] - pi
+            self.position.lon = \
+            divmod(self.position.lon - asin(sin(self.yaw) * sin(distance_rad) / cos(self.position.lat)) + pi,
+                   2 * pi)[1] - pi
         self.position.alt += self.velocities[Z_INDEX] * dt
 
         self.time += dt
@@ -86,5 +89,11 @@ class Projectile:
         return self.position.alt <= 0
 
     def write_position(self, f: TextIO):
-        f.write("{:.4f},{:.2f},{},{},{}\n".format(self.time, self.distance_travelled,
-                                                  self.position.lat, self.position.lon, self.position.alt))
+        if not self.written_header:
+            f.write("Time, Distance travelled, Latitude, Longitude, Altitude, Vx, Vy, Vz, Pitch, Yaw\n")
+            self.written_header = True
+        f.write("{:.4f},{:.2f},{},{},{},{},{},{},{},{}\n".format(self.time, self.distance_travelled,
+                                                                 self.position.lat, self.position.lon,
+                                                                 self.position.alt, self.velocities[X_INDEX],
+                                                                 self.velocities[Y_INDEX], self.velocities[Z_INDEX],
+                                                                 self.pitch, self.yaw))
