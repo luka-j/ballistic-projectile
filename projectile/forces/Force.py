@@ -17,14 +17,14 @@ class Force:
         self.intensity[Y_INDEX] = y
         self.intensity[Z_INDEX] = z
 
-    def get_x(self, projectile: Projectile, env: Environment):
+    def get_x(self, projectile: Projectile, env: Environment) -> float:
         return self.intensity[X_INDEX](projectile, env)
 
-    def get_y(self, projectile: Projectile, env: Environment):
+    def get_y(self, projectile: Projectile, env: Environment) -> float:
         return self.intensity[Y_INDEX](projectile, env)
 
-    def get_z(self, projectile: Projectile, env: Environment):
+    def get_z(self, projectile: Projectile, env: Environment) -> float:
         return self.intensity[Z_INDEX](projectile, env)
 
-    def get(self, axis):
+    def get(self, axis) -> Callable[[Projectile, Environment], float]:
         return self.intensity[axis]
