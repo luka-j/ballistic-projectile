@@ -78,11 +78,11 @@ class Projectile:
                        2 * pi)[1] - pi
         self.position.alt += self.velocities[Z_INDEX] * dt
 
-        self.velocities[Y_INDEX] = (self.environment.earth_radius * (self.position.lat - old_lat))/dt
-        lon_radius = self.environment.earth_radius * cos(self.position.lat)
+        self.velocities[Y_INDEX] = (radius * (self.position.lat - old_lat))/dt
+        lon_radius = radius * cos(self.position.lat)
         if lon_radius == 0:
             # not much we can do on the poles, just use the last good number, it'll be close enough
-            lon_radius = self.environment.earth_radius * cos(old_lat)
+            lon_radius = radius * cos(old_lat)
         self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon))/dt
         self.pitch = atan2(self.velocities[Z_INDEX],
                            sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
