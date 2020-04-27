@@ -59,9 +59,6 @@ class Projectile:
         forces = self.environment.get_forces_intensity(self)
         acc = np.divide(forces, self.mass())
         self.velocities += acc * dt
-        self.pitch = atan2(self.velocities[Z_INDEX],
-                           sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
-        self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
         self.total_velocity = np.sqrt(np.sum(self.velocities ** 2))
         self.directions = np.sign(self.velocities)
         movements = self.velocities * dt
@@ -71,6 +68,7 @@ class Projectile:
         distance_rad = distance_m / radius
 
         old_lat = self.position.lat
+        old_lon = self.position.lon
         self.position.lat = asin(sin(self.position.lat) * cos(distance_rad) +
                                  cos(self.position.lat) * sin(distance_rad) * cos(self.yaw))
         self.directions[Y_INDEX] = sgn(self.position.lat - old_lat)
@@ -79,6 +77,16 @@ class Projectile:
                 divmod(self.position.lon - asin(sin(self.yaw) * sin(distance_rad) / cos(self.position.lat)) + pi,
                        2 * pi)[1] - pi
         self.position.alt += self.velocities[Z_INDEX] * dt
+
+        self.velocities[Y_INDEX] = (self.environment.earth_radius * (self.position.lat - old_lat))/dt
+        lon_radius = self.environment.earth_radius * cos(self.position.lat)
+        if lon_radius == 0:
+            # not much we can do on the poles, just use the last good number, it'll be close enough
+            lon_radius = self.environment.earth_radius * cos(old_lat)
+        self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon))/dt
+        self.pitch = atan2(self.velocities[Z_INDEX],
+                           sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
+        self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
 
         self.time += dt
         self.distance_travelled += distance_m

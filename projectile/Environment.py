@@ -104,6 +104,6 @@ class Environment:
             intensities[Z_INDEX] += force.get_z(projectile, self)
         return intensities
 
-    def create_projectile(self, mass: float, initial_position: Position, cross_section=lambda pitch, yaw: 0.25,
-                          drag_coef=lambda pitch, yaw: 0.05) -> Projectile:
+    def create_projectile(self, mass: float, initial_position: Position, cross_section=lambda axis, pitch, yaw: 0.25,
+                          drag_coef=lambda axis, pitch, yaw: 0.05) -> Projectile:
         return Projectile(self, mass, [0, 0, 0], initial_position, cross_section, drag_coef)
