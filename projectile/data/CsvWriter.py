@@ -1,6 +1,6 @@
 from typing import Text
 
-from projectile.io.DataPoint import DataPoint
+from projectile.data.DataPoint import DataPoint
 
 
 class CsvWriter:
