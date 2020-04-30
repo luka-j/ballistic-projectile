@@ -1,8 +1,10 @@
 from typing import Text
 
+from projectile.data.CsvReader import CsvReader
 from projectile.data.DataPoint import DataPoint
 from math import degrees
 from datetime import datetime, timedelta
+from projectile.util import fp_gt
 
 
 class KmlWriter:
@@ -41,3 +43,24 @@ class KmlWriter:
         self.file.write("</Document>\n")
         self.file.write("</kml>\n")
         self.file.close()
+
+    def convert(self, reader: CsvReader, name="flight", sample_rate=100, speed_factor=1):
+        dt = 1/sample_rate
+        offset = 0
+        self.write_header(name)
+        data = reader.read()
+        self.write(data)
+        new_data = reader.read()
+        while new_data is not None:
+            new_data.time -= offset
+            while new_data is not None and fp_gt(data.time + dt, new_data.time):
+                new_data = reader.read()
+            if new_data is None:
+                break
+            offset += (new_data.time - data.time) * (1 - 1/speed_factor)
+            new_data.time -= (new_data.time - data.time) * (1 - 1/speed_factor)
+
+            data = new_data
+            self.write(data)
+            new_data = reader.read()
+        self.close()
