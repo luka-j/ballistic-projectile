@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import List, TextIO
+from typing import List
 from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.Position import Position
 import numpy as np
-from math import cos, sin, pi, atan2, asin, sqrt
+from math import cos, sin, pi, atan2, asin, sqrt, fabs
 
-from projectile.io.DataPoint import DataPoint
+from projectile.data.DataPoint import DataPoint
 from projectile.util import sgn
 
 
@@ -67,14 +67,15 @@ class Projectile:
         distance_m = np.sqrt(movements[X_INDEX] ** 2 + movements[Y_INDEX] ** 2)
         distance_rad = distance_m / radius
 
+        angle = self.yaw - pi/2
         old_lat = self.position.lat
         old_lon = self.position.lon
         self.position.lat = asin(sin(self.position.lat) * cos(distance_rad) +
-                                 cos(self.position.lat) * sin(distance_rad) * cos(self.yaw))
+                                 cos(self.position.lat) * sin(distance_rad) * cos(angle))
         self.directions[Y_INDEX] = sgn(self.position.lat - old_lat)
         if cos(self.position.lat) != 0:
             self.position.lon = \
-                divmod(self.position.lon - asin(sin(self.yaw) * sin(distance_rad) / cos(self.position.lat)) + pi,
+                divmod(self.position.lon - asin(sin(angle) * sin(distance_rad) / cos(self.position.lat)) + pi,
                        2 * pi)[1] - pi
         self.position.alt += self.velocities[Z_INDEX] * dt
 
@@ -83,7 +84,11 @@ class Projectile:
         if lon_radius == 0:
             # not much we can do on the poles, just use the last good number, it'll be close enough
             lon_radius = radius * cos(old_lat)
-        self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon))/dt
+        if fabs(self.position.lon - old_lon) < pi/2:
+            self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon))/dt
+        else:
+            self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon +
+                                                      pi*sgn(old_lon-self.position.lon))) / dt
         self.pitch = atan2(self.velocities[Z_INDEX],
                            sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
         self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
