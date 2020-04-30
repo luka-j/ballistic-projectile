@@ -6,6 +6,7 @@ from projectile.Position import Position
 import numpy as np
 from math import cos, sin, pi, atan2, asin, sqrt
 
+from projectile.io.DataPoint import DataPoint
 from projectile.util import sgn
 
 
@@ -29,7 +30,6 @@ class Projectile:
         self.pitch = 0
         self.yaw = 0
         self.dt = 0
-        self.written_header = False
 
     def launch_at_angle(self, pitch: float, yaw: float, velocity: float) -> None:
         self.pitch = pitch
@@ -91,18 +91,13 @@ class Projectile:
         self.time += dt
         self.distance_travelled += distance_m
 
-    def mass(self):
+    def mass(self) -> float:
         return self.initial_mass - self.lost_mass
 
-    def has_hit_ground(self):
+    def has_hit_ground(self) -> bool:
         return self.position.alt <= self.environment.surface_altitude(self.position)
 
-    def write_position(self, f: TextIO):
-        if not self.written_header:
-            f.write("Time, Distance travelled, Latitude, Longitude, Altitude, Vx, Vy, Vz, Pitch, Yaw\n")
-            self.written_header = True
-        f.write("{:.4f},{:.2f},{},{},{},{},{},{},{},{}\n".format(self.time, self.distance_travelled,
-                                                                 self.position.lat, self.position.lon,
-                                                                 self.position.alt, self.velocities[X_INDEX],
-                                                                 self.velocities[Y_INDEX], self.velocities[Z_INDEX],
-                                                                 self.pitch, self.yaw))
+    def get_state(self) -> DataPoint:
+        return DataPoint(self.time, self.distance_travelled, self.position.lat, self.position.lon, self.position.alt,
+                         self.velocities[X_INDEX], self.velocities[Y_INDEX], self.velocities[Z_INDEX],
+                         self.pitch, self.yaw)
