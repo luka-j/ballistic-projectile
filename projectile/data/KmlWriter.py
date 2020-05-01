@@ -19,7 +19,7 @@ class KmlWriter:
         self.file.write("<Document>\n")
         self.file.write("   <name>{}</name>\n".format(name))
 
-    def write(self, data: DataPoint):
+    def write(self, data: DataPoint, pretty=False):
         if self.previous is None:
             self.previous = data
             return
@@ -27,15 +27,27 @@ class KmlWriter:
         time = self.date + timedelta(seconds=data.time)
 
         self.file.write("<Placemark>\n")
-        self.file.write("    <TimeSpan>\n        <begin>{}</begin>\n    </TimeSpan>\n"
-                        .format(time.isoformat()))
-        self.file.write("    <LineString>\n")
-        self.file.write("        <extrude>1</extrude>\n")
-        self.file.write("        <altitudeMode>relativeToGround</altitudeMode>\n")
-        self.file.write("        <coordinates>{},{},{} {},{},{}</coordinates>\n"
-                        .format(degrees(self.previous.longitude), degrees(self.previous.latitude),
-                                self.previous.altitude, degrees(data.longitude), degrees(data.latitude), data.altitude))
-        self.file.write("    </LineString>\n")
+        if pretty:
+            self.file.write("    <TimeSpan>\n        <begin>{}</begin>\n    </TimeSpan>\n"
+                            .format(time.isoformat()))
+            self.file.write("    <LineString>\n")
+            self.file.write("        <extrude>1</extrude>\n")
+            self.file.write("        <altitudeMode>relativeToGround</altitudeMode>\n")
+            self.file.write("        <coordinates>{},{},{} {},{},{}</coordinates>\n"
+                            .format(degrees(self.previous.longitude), degrees(self.previous.latitude),
+                                    self.previous.altitude, degrees(data.longitude), degrees(data.latitude), data.altitude))
+            self.file.write("    </LineString>\n")
+        else:
+            self.file.write("<TimeSpan><begin>{}</begin></TimeSpan>"
+                            .format(time.isoformat()))
+            self.file.write("<LineString>")
+            self.file.write("<extrude>1</extrude>")
+            self.file.write("<altitudeMode>relativeToGround</altitudeMode>")
+            self.file.write("<coordinates>{},{},{} {},{},{}</coordinates>"
+                            .format(degrees(self.previous.longitude), degrees(self.previous.latitude),
+                                    self.previous.altitude, degrees(data.longitude), degrees(data.latitude),
+                                    data.altitude))
+            self.file.write("</LineString>")
         self.file.write("</Placemark>\n")
         self.previous = data
 
