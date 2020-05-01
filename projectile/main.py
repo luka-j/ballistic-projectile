@@ -42,7 +42,7 @@ if __name__ == '__main__':
     env = Environment(surface_altitude=lambda p: 77)
     projectile = env.create_projectile(50000, Position(math.radians(44.869389), math.radians(20.640221), 77),
                                        lambda axis, pitch, yaw: 20)
-    projectile.launch_at_angle(2 * math.pi / 4, math.pi/2, 0)
+    projectile.launch_at_angle(math.pi / 4, math.pi/2, 0)
     projectile.add_thrust(ThrustForce(6000, fuel_flow, 100, 300000, 20))
     fly_projectile(projectile, "/home/luka/Documents/mehanika-seminarski/test.csv", DT)
     convert_to_kml("/home/luka/Documents/mehanika-seminarski/test.csv",

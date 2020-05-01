@@ -2,6 +2,8 @@ X_INDEX: int = 0
 Y_INDEX: int = 1
 Z_INDEX: int = 2
 
+DEBUG = False
+
 
 class DragCoefficients:
     SPHERE = 0.47

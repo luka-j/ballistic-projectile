@@ -8,7 +8,7 @@ from projectile.forces.EotvosForce import EotvosForce
 from projectile.forces.Force import Force
 from projectile.forces.NewtonianGravity import NewtonianGravity
 from projectile.Projectile import Projectile
-from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
+from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX, DEBUG
 from math import exp
 
 
@@ -105,10 +105,18 @@ class Environment:
 
     def get_forces_intensity(self, projectile) -> List[float]:
         intensities = [0.0, 0.0, 0.0]
+        if DEBUG:
+            print("Position: {}, {}, {}"
+                  .format(projectile.position.lat, projectile.position.lon, projectile.position.alt))
         for force in self.forces:
-            intensities[X_INDEX] += force.get_x(projectile, self)
-            intensities[Y_INDEX] += force.get_y(projectile, self)
-            intensities[Z_INDEX] += force.get_z(projectile, self)
+            x, y, z = force.get_x(projectile, self), force.get_y(projectile, self), force.get_z(projectile, self)
+            intensities[X_INDEX] += x
+            intensities[Y_INDEX] += y
+            intensities[Z_INDEX] += z
+            if DEBUG:
+                print("{}: {}, {}, {}".format(type(force).__name__, x, y, z))
+        if DEBUG:
+            print("\n")
         return intensities
 
     def create_projectile(self, mass: float, initial_position: Position, cross_section=lambda axis, pitch, yaw: 0.25,

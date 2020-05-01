@@ -70,6 +70,11 @@ class Projectile:
         distance_m = np.sqrt(movements[X_INDEX] ** 2 + movements[Y_INDEX] ** 2)
         distance_rad = distance_m / radius
 
+        if self.time > self.launch_period:
+            self.pitch = atan2(self.velocities[Z_INDEX],
+                               sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
+        self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
+
         angle = self.yaw - pi/2
         old_lat = self.position.lat
         old_lon = self.position.lon
@@ -92,11 +97,6 @@ class Projectile:
         else:
             self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon +
                                                       pi*sgn(old_lon-self.position.lon))) / dt
-
-        if self.time > self.launch_period:
-            self.pitch = atan2(self.velocities[Z_INDEX],
-                               sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
-        self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
 
         self.time += dt
         self.distance_travelled += distance_m
