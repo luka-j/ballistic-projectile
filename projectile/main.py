@@ -34,7 +34,7 @@ if __name__ == '__main__':
     env = Environment()
     projectile = env.create_projectile(1, Position(math.radians(44.869389), math.radians(20.640221), 0))
     projectile.launch_at_angle(math.pi / 4, math.pi/8, 20.0)
-    projectile.add_thrust(ThrustForce(5, lambda t: 10))
+    projectile.add_thrust(ThrustForce(450, 50, lambda t: 10))
     fly_projectile(projectile, "/home/luka/Documents/mehanika-seminarski/test.csv", DT)
     convert_to_kml("/home/luka/Documents/mehanika-seminarski/test.csv",
                    "/home/luka/Documents/mehanika-seminarski/test.kml")
