@@ -84,6 +84,8 @@ class Environment:
     # noinspection PyPep8Naming
     def density(self, altitude: float) -> float:
         """Works up to 86km; above that, things start falling apart (literally, air molecules start falling apart)"""
+        if altitude > 100000:
+            return 0
         h = altitude
         rho_b = self.mass_density(h)
         T = self.std_temp(h)
@@ -95,6 +97,11 @@ class Environment:
             return rho_b * exp((-g_0 * M * (h - h_b)) / (R * T))
         else:
             return rho_b * ((T / (T + L * (h-h_b))) ** (1 + ((g_0 * M) / (R * L))))
+
+    def pressure(self, altitude: float) -> float:
+        rho = self.density(altitude)
+        temp = self.std_temp(altitude) + (altitude-self.atmosphere_layer_start(altitude))*self.temp_lapse_rate(altitude)
+        return rho / self.molar_mass(altitude) * R * temp
 
     def get_forces_intensity(self, projectile) -> List[float]:
         intensities = [0.0, 0.0, 0.0]

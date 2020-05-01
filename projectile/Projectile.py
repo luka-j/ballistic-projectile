@@ -13,7 +13,7 @@ from projectile.util import sgn
 class Projectile:
     def __init__(self, environment: Environment, mass: float, initial_velocities: List[float],
                  initial_position: Position, cross_section=lambda axis, pitch, yaw: 0.25,
-                 drag_coef=lambda axis, pitch, yaw: 0.1):
+                 drag_coef=lambda axis, pitch, yaw: 0.1, launch_period=1):
         if initial_position is None:
             initial_position = Position(44.869389, 20.640221, 0)
         self.initial_mass = mass
@@ -22,6 +22,7 @@ class Projectile:
         self.cross_section = cross_section
         self.drag_coef = drag_coef
         self.environment = environment
+        self.launch_period = launch_period
         self.directions = np.zeros(3)
         self.time = 0
         self.lost_mass = 0
@@ -30,6 +31,7 @@ class Projectile:
         self.pitch = 0
         self.yaw = 0
         self.dt = 0
+        self.thrust = None
 
     def launch_at_angle(self, pitch: float, yaw: float, velocity: float) -> None:
         self.pitch = pitch
@@ -53,6 +55,7 @@ class Projectile:
         """
         self.initial_mass += thrust.remaining_fuel
         self.environment.add_force(thrust)
+        self.thrust = thrust
 
     def advance(self, dt):
         self.dt = dt
@@ -89,8 +92,10 @@ class Projectile:
         else:
             self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon +
                                                       pi*sgn(old_lon-self.position.lon))) / dt
-        self.pitch = atan2(self.velocities[Z_INDEX],
-                           sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
+
+        if self.time > self.launch_period:
+            self.pitch = atan2(self.velocities[Z_INDEX],
+                               sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
         self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
 
         self.time += dt
@@ -103,6 +108,9 @@ class Projectile:
         return self.position.alt <= self.environment.surface_altitude(self.position)
 
     def get_state(self) -> DataPoint:
+        fuel = 0
+        if self.thrust is not None:
+            fuel = self.thrust.remaining_fuel
         return DataPoint(self.time, self.distance_travelled, self.position.lat, self.position.lon, self.position.alt,
                          self.velocities[X_INDEX], self.velocities[Y_INDEX], self.velocities[Z_INDEX],
-                         self.pitch, self.yaw)
+                         self.pitch, self.yaw, fuel)

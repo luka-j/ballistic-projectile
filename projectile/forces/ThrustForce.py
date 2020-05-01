@@ -21,19 +21,27 @@ class ThrustForce(Force):
         if self.last_time == projectile.time:
             return self.last_result
         self.last_time = projectile.time
-        burn_fuel = min(self.fuel_flow(projectile.time) * projectile.dt, self.remaining_fuel)
-        g_0 = env.std_gravity
-        F = g_0 * self.specific_impulse * burn_fuel
-        self.last_result = F
-        return F
+        flow_rate = self.fuel_flow(projectile.time)
+        burned_fuel = flow_rate * projectile.dt
+        if burned_fuel > self.remaining_fuel:  # we're out of fuel, burn the remains
+            burned_fuel = self.remaining_fuel
+            flow_rate = burned_fuel / projectile.dt
+        self.remaining_fuel -= burned_fuel
 
-    def __init__(self, specific_impulse_s: float, total_fuel: float, fuel_flow: Callable[[float], float],
+        self.last_result = self.ejection_speed * flow_rate + \
+            (self.nozzle_pressure - env.pressure(projectile.position.alt)) * self.nozzle_exit_area
+        return self.last_result
+
+    def __init__(self, total_fuel: float, fuel_flow: Callable[[float], float], ejection_speed: float,
+                 nozzle_pressure: float, nozzle_exit_area: float,
                  direction_intensity: Callable[[int, float, Projectile], float] = follow_path):
-        self.specific_impulse = specific_impulse_s
         self.direction_intensity = direction_intensity
         self.remaining_fuel = total_fuel
         self.fuel_flow = fuel_flow
-        self.last_time = 0
+        self.ejection_speed = ejection_speed
+        self.nozzle_exit_area = nozzle_exit_area
+        self.nozzle_pressure = nozzle_pressure
+        self.last_time = -1
         self.last_result = 0
         super().__init__(lambda pr, env: self.direction_intensity(X_INDEX, self.total_intensity(pr, env), pr),
                          lambda pr, env: self.direction_intensity(Y_INDEX, self.total_intensity(pr, env), pr),

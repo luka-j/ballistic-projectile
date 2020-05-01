@@ -1,6 +1,6 @@
 class DataPoint:
     def __init__(self, time: float, planar_distance: float, latitude: float, longitude: float, altitude: float,
-                 x_speed: float, y_speed: float, z_speed: float, pitch: float, yaw: float):
+                 x_speed: float, y_speed: float, z_speed: float, pitch: float, yaw: float, remaining_fuel: float):
         self.time = time
         self.planar_distance = planar_distance
         self.latitude = latitude
@@ -11,3 +11,4 @@ class DataPoint:
         self.z_speed = z_speed
         self.pitch = pitch
         self.yaw = yaw
+        self.remaining_fuel = remaining_fuel
