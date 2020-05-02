@@ -61,7 +61,7 @@ def std_molar_mass(h: float):
 
 class Environment:
 
-    def __init__(self, earth_radius=6378137, earth_angular_velocity=7.292115e-5, surface_altitude=lambda pos: 0,
+    def __init__(self, earth_radius=6378137, earth_angular_velocity=7.2921159e-5, surface_altitude=lambda pos: 0,
                  std_gravity_acc=9.80665, std_temp=std_temp, temp_lapse_rate=std_temp_lapse_rate,
                  mass_density=std_mass_density, atmosphere_layers=std_atmosphere_layer_start, molar_mass=std_molar_mass):
         self.earth_radius = earth_radius

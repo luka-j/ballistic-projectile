@@ -13,7 +13,7 @@ from projectile.util import sgn
 class Projectile:
     def __init__(self, environment: Environment, mass: float, initial_velocities: List[float],
                  initial_position: Position, cross_section=lambda axis, pitch, yaw: 0.25,
-                 drag_coef=lambda axis, pitch, yaw: 0.1, launch_period=1):
+                 drag_coef=lambda axis, pitch, yaw: 0.1):
         if initial_position is None:
             initial_position = Position(44.869389, 20.640221, 0)
         self.initial_mass = mass
@@ -22,7 +22,6 @@ class Projectile:
         self.cross_section = cross_section
         self.drag_coef = drag_coef
         self.environment = environment
-        self.launch_period = launch_period
         self.directions = np.zeros(3)
         self.time = 0
         self.lost_mass = 0
@@ -70,9 +69,8 @@ class Projectile:
         distance_m = np.sqrt(movements[X_INDEX] ** 2 + movements[Y_INDEX] ** 2)
         distance_rad = distance_m / radius
 
-        if self.time > self.launch_period:
-            self.pitch = atan2(self.velocities[Z_INDEX],
-                               sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
+        self.pitch = atan2(self.velocities[Z_INDEX],
+                           sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
         self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
 
         angle = self.yaw - pi/2
@@ -87,16 +85,17 @@ class Projectile:
                        2 * pi)[1] - pi
         self.position.alt += self.velocities[Z_INDEX] * dt
 
-        self.velocities[Y_INDEX] = (radius * (self.position.lat - old_lat))/dt
+        self.velocities[Y_INDEX] = (radius * (self.position.lat - old_lat)) / dt
+        # todo passing the poles - don't update speed, only change sign
         lon_radius = radius * cos(self.position.lat)
         if lon_radius == 0:
             # not much we can do on the poles, just use the last good number, it'll be close enough
             lon_radius = radius * cos(old_lat)
-        if fabs(self.position.lon - old_lon) < pi/2:
+        if fabs(self.position.lon - old_lon) < pi:
             self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon))/dt
         else:
             self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon +
-                                                      pi*sgn(old_lon-self.position.lon))) / dt
+                                                      2*pi*sgn(old_lon-self.position.lon))) / dt
 
         self.time += dt
         self.distance_travelled += distance_m

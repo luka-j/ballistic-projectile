@@ -39,11 +39,11 @@ def fuel_flow(t: float):
 
 
 if __name__ == '__main__':
-    env = Environment(surface_altitude=lambda p: 77)
-    projectile = env.create_projectile(50000, Position(math.radians(44.869389), math.radians(20.640221), 77),
+    env = Environment(surface_altitude=lambda p: 20)
+    projectile = env.create_projectile(100, Position(math.radians(0), math.radians(179.999), 20),
                                        lambda axis, pitch, yaw: 20)
-    projectile.launch_at_angle(math.pi / 4, math.pi/2, 0)
-    projectile.add_thrust(ThrustForce(6000, fuel_flow, 100, 300000, 20))
+    projectile.launch_at_angle(math.pi / 4, 0, 60)
+    # projectile.add_thrust(ThrustForce(6000, fuel_flow, 100, 300000, 20))
     fly_projectile(projectile, "/home/luka/Documents/mehanika-seminarski/test.csv", DT)
     convert_to_kml("/home/luka/Documents/mehanika-seminarski/test.csv",
                    "/home/luka/Documents/mehanika-seminarski/test.kml")
