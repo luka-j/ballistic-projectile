@@ -1,17 +1,19 @@
 from __future__ import annotations
 from projectile.forces.Force import Force
-from math import cos, sin
+from math import cos, sin, pi
 from typing import Callable
 from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
 
 
 def follow_path(axis: int, force: float, pr: Projectile):
+    yaw = pr.yaw
+    pitch = pr.pitch
     if axis == X_INDEX:
-        return force * cos(pr.yaw) * cos(pr.pitch)
+        return force * cos(yaw) * cos(pitch)
     if axis == Y_INDEX:
-        return force * sin(pr.yaw) * cos(pr.pitch)
+        return force * sin(yaw) * cos(pitch)
     if axis == Z_INDEX:
-        return force * sin(pr.pitch)
+        return force * sin(pitch)
 
 
 class ThrustForce(Force):

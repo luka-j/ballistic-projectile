@@ -10,6 +10,7 @@ from projectile.forces.NewtonianGravity import NewtonianGravity
 from projectile.Projectile import Projectile
 from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX, DEBUG
 from math import exp
+import numpy as np
 
 
 R = 8.3144598
@@ -74,9 +75,12 @@ class Environment:
         self.atmosphere_layer_start = atmosphere_layers
         self.molar_mass = molar_mass
         self.forces: List[Force] = [NewtonianGravity(), DragForce(), CoriolisForce(), EotvosForce(), CentrifugalForce()]
+        self.total_forces_impact = np.zeros((len(self.forces), 3))
+        # it'd be prettier if total_forces_impact was dict, but that kills performance
 
     def add_force(self, force: Force) -> None:
         self.forces.append(force)
+        self.total_forces_impact = np.append(self.total_forces_impact, [[0, 0, 0]], 0)
 
     def remove_force(self, force: Force) -> None:
         self.forces.remove(force)
@@ -103,18 +107,19 @@ class Environment:
         temp = self.std_temp(altitude) + (altitude-self.atmosphere_layer_start(altitude))*self.temp_lapse_rate(altitude)
         return rho / self.molar_mass(altitude) * R * temp
 
-    def get_forces_intensity(self, projectile) -> List[float]:
-        intensities = [0.0, 0.0, 0.0]
+    def get_forces_intensity(self, projectile) -> np.array:
+        intensities = np.zeros(3, "float128")
         if DEBUG:
             print("Position: {}, {}, {}"
                   .format(projectile.position.lat, projectile.position.lon, projectile.position.alt))
+        i = 0
         for force in self.forces:
-            x, y, z = force.get_x(projectile, self), force.get_y(projectile, self), force.get_z(projectile, self)
-            intensities[X_INDEX] += x
-            intensities[Y_INDEX] += y
-            intensities[Z_INDEX] += z
+            xyz = np.array([force.get_x(projectile, self), force.get_y(projectile, self), force.get_z(projectile, self)])
+            intensities += xyz
+            self.total_forces_impact[i] += xyz
+            i += 1
             if DEBUG:
-                print("{}: {}, {}, {}".format(type(force).__name__, x, y, z))
+                print("{}: {}, {}, {}".format(type(force).__name__, xyz[0], xyz[1], xyz[2]))
         if DEBUG:
             print("\n")
         return intensities

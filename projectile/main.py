@@ -7,6 +7,9 @@ from projectile.data.CsvReader import CsvReader
 from projectile.forces.ThrustForce import ThrustForce
 from projectile.data.CsvWriter import CsvWriter
 from projectile.data.KmlWriter import KmlWriter
+from projectile.Constants import DEBUG
+from projectile.data.ZipIO import compress, uncompress
+import zipfile
 
 DT = 10**-2
 
@@ -23,28 +26,32 @@ def fly_projectile(projectile: Projectile, outfile_name: str, dt: float):
     writer.close()
 
 
-def convert_to_kml(csv_name: str, kml_name: str):
-    kml = KmlWriter(kml_name)
+def convert_to_kmz(csv_name: str, kml_name: str):
+    kml = KmlWriter(kml_name + ".kml")
     csv = CsvReader(csv_name)
     kml.convert(csv, sample_rate=10)
-    csv.close()
+    compress(kml_name + ".kml", kml_name + ".kmz", zipfile.ZIP_DEFLATED, "doc.kml")
 
 
 def fuel_flow(t: float):
     if t < 0.5:
-        return 6000
+        return 1200
     if t < 2:
         return 500
     return 50
 
 
 if __name__ == '__main__':
-    env = Environment(surface_altitude=lambda p: 20)
-    projectile = env.create_projectile(100, Position(math.radians(0), math.radians(179.999), 20),
+    env = Environment(surface_altitude=lambda p: 77)
+    projectile = env.create_projectile(10000, Position(math.radians(43), math.radians(22), 77),
                                        lambda axis, pitch, yaw: 20)
-    projectile.launch_at_angle(math.pi / 4, 0, 60)
-    # projectile.add_thrust(ThrustForce(6000, fuel_flow, 100, 300000, 20))
+    projectile.launch_at_angle(math.pi / 3, math.pi, 0)
+    projectile.add_thrust(ThrustForce(2800, fuel_flow, 70, 300000, 20))
     fly_projectile(projectile, "/home/luka/Documents/mehanika-seminarski/test.csv", DT)
-    convert_to_kml("/home/luka/Documents/mehanika-seminarski/test.csv",
-                   "/home/luka/Documents/mehanika-seminarski/test.kml")
+
+#    if DEBUG:
+    print("Total: ")
+    print(env.total_forces_impact)
+    convert_to_kmz("/home/luka/Documents/mehanika-seminarski/test.csv",
+                   "/home/luka/Documents/mehanika-seminarski/test")
     print("Finished!")

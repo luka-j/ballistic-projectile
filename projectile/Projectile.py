@@ -59,7 +59,7 @@ class Projectile:
     def advance(self, dt):
         self.dt = dt
         forces = self.environment.get_forces_intensity(self)
-        acc = np.divide(forces, self.mass())
+        acc = forces / self.mass()
         self.velocities += acc * dt
         self.total_velocity = np.sqrt(np.sum(self.velocities ** 2))
         self.directions = np.sign(self.velocities)
@@ -86,7 +86,6 @@ class Projectile:
         self.position.alt += self.velocities[Z_INDEX] * dt
 
         self.velocities[Y_INDEX] = (radius * (self.position.lat - old_lat)) / dt
-        # todo passing the poles - don't update speed, only change sign
         lon_radius = radius * cos(self.position.lat)
         if lon_radius == 0:
             # not much we can do on the poles, just use the last good number, it'll be close enough
