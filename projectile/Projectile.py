@@ -7,13 +7,14 @@ import numpy as np
 from math import cos, sin, pi, atan2, asin, sqrt, fabs
 
 from projectile.data.DataPoint import DataPoint
-from projectile.util import sgn
+from projectile.util import sgn, RollingStatistic, haversine
 
 
 class Projectile:
     def __init__(self, environment: Environment, mass: float, initial_velocities: List[float],
                  initial_position: Position, cross_section=lambda axis, pitch, yaw: 0.25,
-                 drag_coef=lambda axis, pitch, yaw: 0.1):
+                 drag_coef=lambda axis, pitch, yaw: 0.1, vy_corrective_change_threshold=0.1,
+                 distance_rolling_window=40):
         if initial_position is None:
             initial_position = Position(44.869389, 20.640221, 0)
         self.initial_mass = mass
@@ -22,6 +23,8 @@ class Projectile:
         self.cross_section = cross_section
         self.drag_coef = drag_coef
         self.environment = environment
+        self.vy_corrective_change_threshold = vy_corrective_change_threshold
+        self.skipped_vy_correction = False
         self.directions = np.zeros(3)
         self.time = 0
         self.lost_mass = 0
@@ -31,6 +34,7 @@ class Projectile:
         self.yaw = 0
         self.dt = 0
         self.thrust = None
+        self.distance_stats = RollingStatistic(distance_rolling_window)
 
     def launch_at_angle(self, pitch: float, yaw: float, velocity: float) -> None:
         self.pitch = pitch
@@ -69,10 +73,6 @@ class Projectile:
         distance_m = np.sqrt(movements[X_INDEX] ** 2 + movements[Y_INDEX] ** 2)
         distance_rad = distance_m / radius
 
-        self.pitch = atan2(self.velocities[Z_INDEX],
-                           sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
-        self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
-
         angle = self.yaw - pi/2
         old_lat = self.position.lat
         old_lon = self.position.lon
@@ -85,19 +85,48 @@ class Projectile:
                        2 * pi)[1] - pi
         self.position.alt += self.velocities[Z_INDEX] * dt
 
-        self.velocities[Y_INDEX] = (radius * (self.position.lat - old_lat)) / dt
+        self.time += dt
+        self.distance_travelled += distance_m
+        # first update angles, then velocities: otherwise, low intensity forces (e.g. Coriolis) will be lost in rounding
+        self.update_angles()
+        self.update_velocities(old_lat, old_lon, radius, distance_m)
+
+    def update_velocities(self, old_lat: np.float128, old_lon: np.float128, radius: float, distance_m: float) -> None:
+        old_vy = self.velocities[Y_INDEX]
+        self.velocities[Y_INDEX] = (radius * (self.position.lat - old_lat)) / self.dt
+        change_ratio = fabs(self.velocities[Y_INDEX] / old_vy - 1)
+        if change_ratio > self.vy_corrective_change_threshold:
+            actual_distance = haversine(self.position, Position(old_lat, old_lon, 0), radius)
+            if self.skipped_vy_correction:
+                print("Warning! V_y has too extreme oscillations: %f" % change_ratio)
+            elif actual_distance < self.distance_stats.mean and self.distance_stats.is_outlier(actual_distance):
+                # assume we've just crossed the pole
+                print("Crossing the pole: change ratio is %f" % change_ratio)
+                self.velocities[Y_INDEX] = -old_vy
+                self.skipped_vy_correction = True
+                self.position.lon = divmod(self.position.lon + pi, 2 * pi)[1]
+                self.velocities[X_INDEX] = -self.velocities[X_INDEX]
+                return  # don't update X velocity!
+            elif actual_distance < self.distance_stats.mean:
+                print("Warning: Vy has extreme correction, but we're far from poles: %f" % change_ratio)
+        else:
+            self.skipped_vy_correction = False
+
+        self.distance_stats.update(distance_m)
         lon_radius = radius * cos(self.position.lat)
         if lon_radius == 0:
             # not much we can do on the poles, just use the last good number, it'll be close enough
             lon_radius = radius * cos(old_lat)
-        if fabs(self.position.lon - old_lon) < pi:
-            self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon))/dt
-        else:
+        if fabs(self.position.lon - old_lon) < pi:  # normal case
+            self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon)) / self.dt
+        else:  # crossing the antimeridian
             self.velocities[X_INDEX] = (lon_radius * (self.position.lon - old_lon +
-                                                      2*pi*sgn(old_lon-self.position.lon))) / dt
+                                                      2 * pi * sgn(old_lon - self.position.lon))) / self.dt
 
-        self.time += dt
-        self.distance_travelled += distance_m
+    def update_angles(self) -> None:
+        self.pitch = atan2(self.velocities[Z_INDEX],
+                           sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2))
+        self.yaw = atan2(self.velocities[Y_INDEX], self.velocities[X_INDEX])
 
     def mass(self) -> float:
         return self.initial_mass - self.lost_mass
