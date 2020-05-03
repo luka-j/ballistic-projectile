@@ -8,12 +8,9 @@ from projectile.forces.EotvosForce import EotvosForce
 from projectile.forces.Force import Force
 from projectile.forces.NewtonianGravity import NewtonianGravity
 from projectile.Projectile import Projectile
-from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX, DEBUG
+from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX, DEBUG, R
 from math import exp
 import numpy as np
-
-
-R = 8.3144598
 
 
 def std_temp_lapse_rate(h: float):
@@ -83,7 +80,11 @@ class Environment:
         self.total_forces_impact = np.append(self.total_forces_impact, [[0, 0, 0]], 0)
 
     def remove_force(self, force: Force) -> None:
-        self.forces.remove(force)
+        for f in self.forces:
+            if type(f) == type(force):
+                self.forces.remove(f)
+                return
+        print("Non-existing force {}!".format(type(force).__name__))
 
     # noinspection PyPep8Naming
     def density(self, altitude: float) -> float:

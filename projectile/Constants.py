@@ -4,6 +4,9 @@ Z_INDEX: int = 2
 
 DEBUG = False
 
+R = 8.3144598
+G = 6.674e-11
+
 
 class DragCoefficients:
     SPHERE = 0.47

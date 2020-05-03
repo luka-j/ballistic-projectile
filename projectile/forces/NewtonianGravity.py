@@ -1,6 +1,5 @@
 from projectile.forces.Force import Force
-
-G = 6.674e-11
+from projectile.Constants import G
 
 
 class NewtonianGravity(Force):
