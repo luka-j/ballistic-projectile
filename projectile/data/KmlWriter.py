@@ -1,13 +1,12 @@
+import zipfile
+from datetime import datetime, timedelta
+from math import degrees
 from typing import Text
 
 from projectile.data.CsvReader import CsvReader
 from projectile.data.DataPoint import DataPoint
-from math import degrees
-from datetime import datetime, timedelta
-
 from projectile.data.ZipIO import compress
 from projectile.util import fp_gt
-import zipfile
 
 
 def convert_csv_to_kmz(csv_name: str, kml_name: str):

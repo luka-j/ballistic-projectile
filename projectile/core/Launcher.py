@@ -1,11 +1,12 @@
+import os
+
 from projectile.core.Environment import Environment
 from projectile.core.Position import Position
 from projectile.core.Projectile import Projectile
 from projectile.data.CsvWriter import CsvWriter
+from projectile.data.KmlWriter import convert_csv_to_kmz
 from projectile.forces.ThrustForce import follow_path, ThrustForce
 from projectile.util import spherical_to_planar_coord
-from projectile.data.KmlWriter import convert_csv_to_kmz
-import os
 
 
 def default_fuel_flow(t: float):

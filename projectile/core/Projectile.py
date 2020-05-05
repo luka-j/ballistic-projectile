@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from math import cos, sin, pi, atan2, asin, sqrt, fabs
 from typing import List
+
+import numpy as np
+
 from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.core.Position import Position
-import numpy as np
-from math import cos, sin, pi, atan2, asin, sqrt, fabs
-
 from projectile.data.DataPoint import DataPoint
 from projectile.util import sgn, RollingStatistic, haversine
 

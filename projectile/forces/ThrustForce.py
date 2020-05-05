@@ -1,7 +1,9 @@
 from __future__ import annotations
-from projectile.forces.Force import Force
+
 from typing import Callable
+
 from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
+from projectile.forces.Force import Force
 from projectile.util import spherical_to_planar_coord
 
 

@@ -1,5 +1,5 @@
-from projectile.forces.Force import Force
 from projectile.core.Constants import G
+from projectile.forces.Force import Force
 
 
 class NewtonianGravity(Force):
