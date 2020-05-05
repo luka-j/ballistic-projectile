@@ -24,6 +24,7 @@ class ThrustForce(Force):
             burned_fuel = self.remaining_fuel
             flow_rate = burned_fuel / projectile.dt
         self.remaining_fuel -= burned_fuel
+        projectile.lost_mass += burned_fuel
 
         self.last_result = self.ejection_speed * flow_rate + \
             (self.nozzle_pressure - env.pressure(projectile.position.alt)) * self.nozzle_exit_area
