@@ -61,23 +61,24 @@ class Environment:
              * self.atmosphere.temp_lapse_rate(altitude)
         return rho / self.atmosphere.molar_mass(altitude) * R * temp
 
-    def get_forces_intensity(self, projectile) -> np.array:
-        intensities = np.zeros(3, "float128")
+    def get_forces_intensities(self, projectile) -> np.array:
+        intensities = np.zeros([len(self.forces), 3], "float128")
         if DEBUG:
             print("Position: {}, {}, {}"
                   .format(projectile.position.lat, projectile.position.lon, projectile.position.alt))
         i = 0
         for force in self.forces:
             xyz = np.array([force.get_x(projectile, self), force.get_y(projectile, self), force.get_z(projectile, self)])
-            intensities += xyz
+            intensities[i] = xyz
             self.total_forces_impact[i] += xyz
             i += 1
-            if DEBUG:
-                print("{}: {}, {}, {}".format(type(force).__name__, xyz[0], xyz[1], xyz[2]))
         if DEBUG:
+            print(intensities)
             print("\n")
+
         return intensities
 
     def create_projectile(self, mass: float, initial_position: Position, cross_section=lambda axis, pitch, yaw: 0.25,
-                          drag_coef=lambda axis, pitch, yaw: 0.05) -> Projectile:
-        return Projectile(self, mass, [0, 0, 0], initial_position, cross_section, drag_coef)
+                          drag_coef=lambda axis, pitch, yaw: 0.05, forces_writer=None) -> Projectile:
+        return Projectile(self, mass, [0, 0, 0], initial_position, cross_section, drag_coef,
+                          forces_writer=forces_writer)

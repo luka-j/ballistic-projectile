@@ -7,7 +7,7 @@ import numpy as np
 
 from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.core.Position import Position
-from projectile.data.DataPoint import DataPoint
+from projectile.data.DataPoints import ProjectileDataPoint, ForcesDataPoint
 from projectile.util import sgn, RollingStatistic, haversine
 
 
@@ -15,7 +15,7 @@ class Projectile:
     def __init__(self, environment: Environment, mass: float, initial_velocities: List[float],
                  initial_position: Position, cross_section=lambda axis, pitch, yaw: 0.25,
                  drag_coef=lambda axis, pitch, yaw: 0.1, vy_corrective_change_threshold=0.1,
-                 distance_rolling_window=40):
+                 distance_rolling_window=40, forces_writer: ForcesCsvWriter = None):
         if initial_position is None:
             initial_position = Position(44.869389, 20.640221, 0)
         self.initial_mass = mass
@@ -25,6 +25,7 @@ class Projectile:
         self.drag_coef = drag_coef
         self.environment = environment
         self.vy_corrective_change_threshold = vy_corrective_change_threshold
+        self.forces_writer = forces_writer
         self.crossed_the_pole = False
         self.directions = np.zeros(3)
         self.time = 0
@@ -63,8 +64,10 @@ class Projectile:
 
     def advance(self, dt):
         self.dt = dt
-        forces = self.environment.get_forces_intensity(self)
-        acc = forces / self.mass()
+        forces = self.environment.get_forces_intensities(self)
+        if self.forces_writer is not None:
+            self.forces_writer.write_data(ForcesDataPoint(self.time, self.mass(), forces))
+        acc = forces.sum(0) / self.mass()
         self.velocities += acc * dt
         self.total_velocity = np.sqrt(np.sum(self.velocities ** 2))
         self.directions = np.sign(self.velocities)
@@ -137,10 +140,10 @@ class Projectile:
     def has_hit_ground(self) -> bool:
         return self.position.alt <= self.environment.surface_altitude(self.position)
 
-    def get_state(self) -> DataPoint:
+    def get_state(self) -> ProjectileDataPoint:
         fuel = 0
         if self.thrust is not None:
             fuel = self.thrust.remaining_fuel
-        return DataPoint(self.time, self.distance_travelled, self.position.lat, self.position.lon, self.position.alt,
-                         self.velocities[X_INDEX], self.velocities[Y_INDEX], self.velocities[Z_INDEX],
-                         self.pitch, self.yaw, fuel)
+        return ProjectileDataPoint(self.time, self.distance_travelled, self.position.lat, self.position.lon, self.position.alt,
+                                   self.velocities[X_INDEX], self.velocities[Y_INDEX], self.velocities[Z_INDEX],
+                                   self.pitch, self.yaw, fuel)

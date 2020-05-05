@@ -4,7 +4,7 @@ from math import degrees
 from typing import Text
 
 from projectile.data.CsvReader import CsvReader
-from projectile.data.DataPoint import DataPoint
+from projectile.data.DataPoints import ProjectileDataPoint
 from projectile.data.ZipIO import compress
 from projectile.util import fp_gt
 
@@ -38,7 +38,7 @@ class KmlWriter:
         self.file.write("<Style id=\"peak\"><PolyStyle><color>ff0080ff</color></PolyStyle></Style>\n")
         self.file.write("<Style id=\"fuel\"><PolyStyle><color>ff0000ff</color></PolyStyle></Style>\n")
 
-    def write(self, data: DataPoint, pretty=False):
+    def write(self, data: ProjectileDataPoint, pretty=False):
         if self.previous is None:
             self.previous = data
             return

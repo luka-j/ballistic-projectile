@@ -1,6 +1,6 @@
 from typing import Text
 
-from projectile.data.DataPoint import DataPoint
+from projectile.data.DataPoints import ProjectileDataPoint
 
 
 class CsvReader:
@@ -16,8 +16,9 @@ class CsvReader:
         if line == "":
             return None
         line = line.split(",")
-        return DataPoint(float(line[0]), float(line[1]), float(line[2]), float(line[3]), float(line[4]), float(line[5]),
-                         float(line[6]), float(line[7]), float(line[8]), float(line[9]), float(line[10].strip()))
+        return ProjectileDataPoint(float(line[0]), float(line[1]), float(line[2]), float(line[3]), float(line[4]),
+                                   float(line[5]), float(line[6]), float(line[7]), float(line[8]), float(line[9]),
+                                   float(line[10].strip()))
 
     def close(self):
         self.file.close()
