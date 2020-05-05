@@ -1,7 +1,7 @@
 from math import cos
 
 from projectile.forces.Force import Force
-from projectile.Constants import X_INDEX
+from projectile.core.Constants import X_INDEX
 
 
 class EotvosForce(Force):

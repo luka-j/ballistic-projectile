@@ -1,14 +1,14 @@
 from typing import List
 
-from projectile.Position import Position
+from projectile.core.Position import Position
 from projectile.forces.CentrifugalForce import CentrifugalForce
 from projectile.forces.CoriolisForce import CoriolisForce
 from projectile.forces.DragForce import DragForce
 from projectile.forces.EotvosForce import EotvosForce
 from projectile.forces.Force import Force
 from projectile.forces.NewtonianGravity import NewtonianGravity
-from projectile.Projectile import Projectile
-from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX, DEBUG, R, StandardAtmosphere
+from projectile.core.Projectile import Projectile
+from projectile.core.Constants import DEBUG, R, StandardAtmosphere
 from math import exp
 import numpy as np
 

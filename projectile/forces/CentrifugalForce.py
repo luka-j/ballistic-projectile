@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from projectile.Projectile import Projectile
+from projectile.core.Projectile import Projectile
 from projectile.forces.Force import Force
 from math import cos, sin, fabs
 from projectile.util import sgn

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from projectile.Projectile import Projectile
+from projectile.core.Projectile import Projectile
 from projectile.forces.Force import Force
-from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
+from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
 
 
 # noinspection PyUnresolvedReferences

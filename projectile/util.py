@@ -1,7 +1,7 @@
 from math import fabs, sqrt, sin, cos, asin
 from collections import deque
-from projectile.Position import Position
-from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
+from projectile.core.Position import Position
+from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
 
 
 def sgn(x) -> int:

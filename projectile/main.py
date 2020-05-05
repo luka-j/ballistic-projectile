@@ -1,14 +1,13 @@
 import math
 
-from projectile.Environment import Environment
-from projectile.Position import Position
-from projectile.Projectile import Projectile
+from projectile.core.Environment import Environment
+from projectile.core.Position import Position
+from projectile.core.Projectile import Projectile
 from projectile.data.CsvReader import CsvReader
 from projectile.forces.ThrustForce import ThrustForce, follow_path
 from projectile.data.CsvWriter import CsvWriter
 from projectile.data.KmlWriter import KmlWriter
-from projectile.Constants import DEBUG
-from projectile.data.ZipIO import compress, uncompress
+from projectile.data.ZipIO import compress
 from projectile.util import spherical_to_planar_coord
 import zipfile
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from typing import List
-from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
-from projectile.Position import Position
+from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
+from projectile.core.Position import Position
 import numpy as np
 from math import cos, sin, pi, atan2, asin, sqrt, fabs
 

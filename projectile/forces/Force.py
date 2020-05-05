@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Callable
 
-from projectile.Constants import X_INDEX, Y_INDEX, Z_INDEX
-from projectile.Projectile import Projectile
+from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
+from projectile.core.Projectile import Projectile
 
 
 # noinspection PyUnresolvedReferences
