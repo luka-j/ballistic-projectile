@@ -4,7 +4,17 @@ from projectile.data.CsvReader import CsvReader
 from projectile.data.DataPoint import DataPoint
 from math import degrees
 from datetime import datetime, timedelta
+
+from projectile.data.ZipIO import compress
 from projectile.util import fp_gt
+import zipfile
+
+
+def convert_csv_to_kmz(csv_name: str, kml_name: str):
+    kml = KmlWriter(kml_name + ".kml")
+    csv = CsvReader(csv_name)
+    kml.convert(csv, sample_rate=10)
+    compress(kml_name + ".kml", kml_name + ".kmz", zipfile.ZIP_DEFLATED, "doc.kml")
 
 
 class KmlWriter:
