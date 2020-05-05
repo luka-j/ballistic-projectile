@@ -10,19 +10,18 @@ from projectile.util import spherical_to_planar_coord
 
 
 def default_fuel_flow(t: float):
-    if t < 0.5:
-        return 800
     if t < 2:
         return 600
-    return 50
+    return 100
 
 
 class Launcher:
     def default_thrust_direction(self, axis: int, force: float, pr: Projectile):
-        if pr.time > 1:
-            return follow_path(axis, force, pr)
-        else:
+        if pr.time < 2:
             return spherical_to_planar_coord(axis, force, self.pitch, self.yaw)
+        if pr.pitch < 0.15:
+            spherical_to_planar_coord(axis, force, self.pitch + 0.17, self.yaw)
+        return follow_path(axis, force, pr)
 
     def __init__(self, pitch, yaw, csv_filename, kmz_filename, forces_csv_filename=None, dt=0.01, keep_csv=True,
                  environment: Environment = None, thrust: ThrustForce = None):
@@ -36,7 +35,7 @@ class Launcher:
             environment = Environment()
         self.environment = environment
         if thrust is None:
-            thrust = ThrustForce(1800, default_fuel_flow, 70, 150000, 20, self.default_thrust_direction)
+            thrust = ThrustForce(1800, default_fuel_flow, 100, 150000, 5, self.default_thrust_direction)
         self.forces_csv_filename = forces_csv_filename
         self.thrust = thrust
 
