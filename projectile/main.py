@@ -35,7 +35,7 @@ def convert_to_kmz(csv_name: str, kml_name: str):
 
 
 LAUNCH_PITCH = math.pi / 4
-LAUNCH_YAW = -math.pi / 2
+LAUNCH_YAW = math.pi / 2
 
 
 def fuel_flow(t: float):
@@ -55,7 +55,7 @@ def thrust_direction(axis: int, force: float, pr: Projectile):
 
 if __name__ == '__main__':
     env = Environment(surface_altitude=lambda p: 77)
-    projectile = env.create_projectile(8000, Position(math.radians(64), math.radians(24), 77),
+    projectile = env.create_projectile(8000, Position(math.radians(80), math.radians(24), 77),
                                        lambda axis, pitch, yaw: 20)
     projectile.launch_at_angle(LAUNCH_PITCH, LAUNCH_YAW, 0)
     projectile.add_thrust(ThrustForce(2500, fuel_flow, 80, 200000, 20, thrust_direction))

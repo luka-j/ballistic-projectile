@@ -24,7 +24,7 @@ class Projectile:
         self.drag_coef = drag_coef
         self.environment = environment
         self.vy_corrective_change_threshold = vy_corrective_change_threshold
-        self.skipped_vy_correction = False
+        self.crossed_the_pole = False
         self.directions = np.zeros(3)
         self.time = 0
         self.lost_mass = 0
@@ -97,20 +97,22 @@ class Projectile:
         change_ratio = fabs(self.velocities[Y_INDEX] / old_vy - 1)
         if change_ratio > self.vy_corrective_change_threshold:
             actual_distance = haversine(self.position, Position(old_lat, old_lon, 0), radius)
-            if self.skipped_vy_correction:
+            if self.crossed_the_pole:
                 print("Warning! V_y has too extreme oscillations: %f" % change_ratio)
             elif actual_distance < self.distance_stats.mean and self.distance_stats.is_outlier(actual_distance):
                 # assume we've just crossed the pole
                 print("Crossing the pole: change ratio is %f" % change_ratio)
                 self.velocities[Y_INDEX] = -old_vy
-                self.skipped_vy_correction = True
+                self.crossed_the_pole = True
                 self.position.lon = divmod(self.position.lon + pi, 2 * pi)[1]
                 self.velocities[X_INDEX] = -self.velocities[X_INDEX]
                 return  # don't update X velocity!
             elif actual_distance < self.distance_stats.mean:
                 print("Warning: Vy has extreme correction, but we're far from poles: %f" % change_ratio)
-        else:
-            self.skipped_vy_correction = False
+        if self.crossed_the_pole:
+            self.crossed_the_pole = False
+            self.velocities[Y_INDEX] = old_vy  # don't correct speed if we've just skipped the pole
+            return
 
         self.distance_stats.update(distance_m)
         lon_radius = radius * cos(self.position.lat)
