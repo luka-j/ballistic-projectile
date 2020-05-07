@@ -35,7 +35,7 @@ class Launcher:
             environment = Environment()
         self.environment = environment
         if thrust is None:
-            thrust = ThrustForce(1800, default_fuel_flow, 100, 150000, 5, self.default_thrust_direction)
+            thrust = ThrustForce(1800, default_fuel_flow, 100, 150000, 9, self.default_thrust_direction)
         self.forces_csv_filename = forces_csv_filename
         self.thrust = thrust
 
