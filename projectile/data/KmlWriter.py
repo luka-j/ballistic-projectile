@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from math import degrees
 from typing import Text
 
-from projectile.data.CsvReader import CsvReader
+from projectile.data.CsvReaders import ProjectileCsvReader
 from projectile.data.DataPoints import ProjectileDataPoint
 from projectile.data.ZipIO import compress
 from projectile.util import fp_gt
@@ -11,7 +11,7 @@ from projectile.util import fp_gt
 
 def convert_csv_to_kmz(csv_name: str, kml_name: str):
     kml = KmlWriter(kml_name + ".kml")
-    csv = CsvReader(csv_name)
+    csv = ProjectileCsvReader(csv_name)
     kml.convert(csv, sample_rate=10)
     compress(kml_name + ".kml", kml_name + ".kmz", zipfile.ZIP_DEFLATED, "doc.kml")
 
@@ -86,7 +86,7 @@ class KmlWriter:
         self.file.write("</kml>\n")
         self.file.close()
 
-    def convert(self, reader: CsvReader, name="flight", sample_rate=100, speed_factor=1):
+    def convert(self, reader: ProjectileCsvReader, name="flight", sample_rate=100, speed_factor=1):
         dt = 1/sample_rate
         offset = 0
         self.write_header(name)

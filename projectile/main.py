@@ -5,8 +5,11 @@ from projectile.core.Launcher import Launcher
 from projectile.core.Position import Position
 
 if __name__ == '__main__':
-    launcher = Launcher(math.pi / 4, math.pi/2, "test.csv", "test", "forces.csv",
-                        environment=Environment(surface_altitude=lambda p: 77))
+    env = Environment(surface_altitude=lambda p: 77)
+    launcher = Launcher(math.pi / 4, math.pi/2, "test.csv", "test", "forces.csv", environment=env)
     launcher.launch(8000, Position(math.radians(80), math.radians(24), 77))
 
-    print("Finished!")
+    print("Launch finished, plotting...")
+    env.plot_all_forces("forces.csv")
+
+    print("Done!")

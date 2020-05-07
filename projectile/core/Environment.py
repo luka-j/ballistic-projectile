@@ -6,12 +6,14 @@ import numpy as np
 from projectile.core.Constants import DEBUG, R, StandardAtmosphere
 from projectile.core.Position import Position
 from projectile.core.Projectile import Projectile
+from projectile.data.CsvReaders import ForcesCsvReader
 from projectile.forces.CentrifugalForce import CentrifugalForce
 from projectile.forces.CoriolisForce import CoriolisForce
 from projectile.forces.DragForce import DragForce
 from projectile.forces.EotvosForce import EotvosForce
 from projectile.forces.Force import Force
 from projectile.forces.NewtonianGravity import NewtonianGravity
+from projectile.data.Plotter import simple_force_plot
 
 
 class Environment:
@@ -82,3 +84,9 @@ class Environment:
                           drag_coef=lambda axis, pitch, yaw: 0.05, forces_writer=None) -> Projectile:
         return Projectile(self, mass, [0, 0, 0], initial_position, cross_section, drag_coef,
                           forces_writer=forces_writer)
+
+    def plot_all_forces(self, forces_filename: str):
+        i = 0
+        for force in self.forces:
+            simple_force_plot(ForcesCsvReader(forces_filename), i, type(force).__name__)
+            i += 1
