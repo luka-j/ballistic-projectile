@@ -19,4 +19,5 @@ def simple_force_plot(reader: ForcesCsvReader, index: int, title: str):
     plt.plot(data[0], data[2]/data[1], 'r', label="X")
     plt.plot(data[0], data[3]/data[1], 'g', label="Y")
     plt.plot(data[0], data[4]/data[1], 'b', label="Z")
+    plt.legend()
     plt.show()
