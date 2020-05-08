@@ -1,3 +1,5 @@
+import time
+
 from collections import deque
 from math import fabs, sqrt, sin, cos, asin
 
@@ -81,3 +83,24 @@ class RollingStatistic:
         if self.filled < self.ready_threshold:
             return False
         return fabs(sample - self.mean) > self.stddev*stddev_threshold
+
+
+class Stopwatch:
+    def __init__(self):
+        self.start_time = 0
+        self.total_time = 0
+        self.lap_count = 0
+
+    def start(self):
+        self.start_time = time.time()
+
+    def lap(self):
+        lap_time = time.time() - self.start_time
+        self.total_time += lap_time
+        self.lap_count += 1
+        print("Lap {}: {}, total: {}".format(self.lap_count, lap_time, self.total_time))
+        self.start_time = time.time()
+
+    def stop(self):
+        self.total_time += (time.time() - self.start_time)
+        print("Execution finished. Total time: {}".format(self.total_time))

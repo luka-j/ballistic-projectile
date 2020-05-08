@@ -13,7 +13,7 @@ def convert_csv_to_kmz(csv_name: str, kml_name: str):
     kml = KmlWriter(kml_name + ".kml")
     csv = ProjectileCsvReader(csv_name)
     kml.convert(csv, sample_rate=10)
-    compress(kml_name + ".kml", kml_name + ".kmz", zipfile.ZIP_DEFLATED, "doc.kml")
+    compress(kml_name + ".kml", kml_name + ".kmz", zipfile.ZIP_DEFLATED, "doc.kml", False)
 
 
 class KmlWriter:

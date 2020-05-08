@@ -34,8 +34,6 @@ class Launcher:
         if environment is None:
             environment = Environment()
         self.environment = environment
-        if thrust is None:
-            thrust = ThrustForce(1800, default_fuel_flow, 100, 150000, 9, self.default_thrust_direction)
         self.forces_csv_filename = forces_csv_filename
         self.thrust = thrust
 
@@ -48,7 +46,8 @@ class Launcher:
             forces_writer = None
         projectile = self.environment.create_projectile(mass, position, cross_section, drag_coeff, forces_writer)
         projectile.launch_at_angle(self.pitch, self.yaw, velocity)
-        projectile.add_thrust(self.thrust)
+        if self.thrust is not None:
+            projectile.add_thrust(self.thrust)
 
         writer = ProjectileCsvWriter(self.csv_filename)
         writer.write_header()
