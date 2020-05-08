@@ -26,12 +26,9 @@ class Environment:
         self.std_gravity = std_gravity_acc
         self.atmosphere = atmosphere
         self.forces: List[Force] = [NewtonianGravity(), DragForce(), CoriolisForce(), EotvosForce(), CentrifugalForce()]
-        self.total_forces_impact = np.zeros((len(self.forces), 3))
-        # it'd be prettier if total_forces_impact was dict, but that kills performance
 
     def add_force(self, force: Force) -> None:
         self.forces.append(force)
-        self.total_forces_impact = np.append(self.total_forces_impact, [[0, 0, 0]], 0)
 
     def remove_force(self, force: Force) -> None:
         for f in self.forces:
@@ -70,9 +67,8 @@ class Environment:
                   .format(projectile.position.lat, projectile.position.lon, projectile.position.alt))
         i = 0
         for force in self.forces:
-            xyz = np.array([force.get_x(projectile, self), force.get_y(projectile, self), force.get_z(projectile, self)])
-            intensities[i] = xyz
-            self.total_forces_impact[i] += xyz
+            intensities[i] = np.array([force.get_x(projectile, self), force.get_y(projectile, self),
+                                       force.get_z(projectile, self)])
             i += 1
         if DEBUG:
             print(intensities)
