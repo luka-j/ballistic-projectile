@@ -8,7 +8,7 @@ import numpy as np
 from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.core.Position import Position
 from projectile.data.DataPoints import ProjectileDataPoint, ForcesDataPoint
-from projectile.util import sgn, RollingStatistic, haversine
+from projectile.util import sgn, RollingStatistic, haversine, fp_eq
 
 
 class Projectile:
@@ -32,6 +32,7 @@ class Projectile:
         self.lost_mass = 0
         self.distance_travelled = 0
         self.total_velocity = 0
+        self.planar_velocity = 0
         self.pitch = 0
         self.yaw = 0
         self.dt = 0
@@ -69,10 +70,12 @@ class Projectile:
             self.forces_writer.write_data(ForcesDataPoint(self.time, self.mass(), forces))
         acc = forces.sum(0) / self.mass()
         self.velocities += acc * dt
-        self.total_velocity = np.sqrt(np.sum(self.velocities ** 2))
+        self.planar_velocity = sqrt(self.velocities[X_INDEX] ** 2 + self.velocities[Y_INDEX] ** 2)
+        self.total_velocity = sqrt(self.planar_velocity ** 2 + self.velocities[Z_INDEX] ** 2)
         self.directions = np.sign(self.velocities)
         movements = self.velocities * dt
 
+        self.update_angles()
         radius = self.environment.earth_radius + self.position.alt
         distance_m = np.sqrt(movements[X_INDEX] ** 2 + movements[Y_INDEX] ** 2)
         distance_rad = distance_m / radius
@@ -83,7 +86,7 @@ class Projectile:
         self.position.lat = asin(sin(self.position.lat) * cos(distance_rad) +
                                  cos(self.position.lat) * sin(distance_rad) * cos(angle))
         self.directions[Y_INDEX] = sgn(self.position.lat - old_lat)
-        if cos(self.position.lat) != 0:
+        if not fp_eq(cos(self.position.lat), 0):
             self.position.lon = \
                 divmod(self.position.lon - asin(sin(angle) * sin(distance_rad) / cos(self.position.lat)) + pi,
                        2 * pi)[1] - pi
@@ -92,8 +95,8 @@ class Projectile:
         self.time += dt
         self.distance_travelled += distance_m
         # first update angles, then velocities: otherwise, low intensity forces (e.g. Coriolis) will be lost in rounding
-        self.update_angles()
         self.update_velocities(old_lat, old_lon, radius, distance_m)
+        self.update_angles()
 
     def update_velocities(self, old_lat: np.float128, old_lon: np.float128, radius: float, distance_m: float) -> None:
         old_vy = self.velocities[Y_INDEX]
