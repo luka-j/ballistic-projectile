@@ -1,5 +1,6 @@
 import math
 import os
+import shutil
 
 from projectile.core.Constants import Z_INDEX
 from projectile.core.Environment import Environment
@@ -131,6 +132,37 @@ def run(scenario: str) -> None:
             compress("%s%d.csv" % (frcdir, pitch), "%s%d.bz2" % (frcdir, pitch), name_inside_zip="%d.csv" % pitch,
                      keep_original=False)
             stopwatch.lap()
+
+    def test():
+        print("Running test")
+        def fuel_flow(t: float):
+            if t < 1:
+                return 600
+            if t < 3:
+                return 300
+            return 100
+
+        def thrust_direction(axis: int, force: float, pr: Projectile):
+            if pr.time < 1.2:
+                return spherical_to_planar_coord(axis, force, math.pi / 4, 0)
+            if (pr.position.alt > 100000 or pr.velocities[Z_INDEX] > 3500) and pr.pitch > 0.2:
+                spherical_to_planar_coord(axis, force, pr.pitch - 0.12, pr.yaw)
+            if pr.pitch < 0.15:
+                spherical_to_planar_coord(axis, force, pr.pitch + 0.17, pr.yaw)
+            return follow_path(axis, force, pr)
+
+        if os.path.exists("scenario_data/test/"):
+            shutil.rmtree("scenario_data/test/")
+        csvdir, kmldir, frcdir, stopwatch = init_scenario("test")
+        stopwatch.start()
+
+        env = Environment(surface_altitude=lambda p: 80)
+        thrust = ThrustForce(3500, fuel_flow, 150, 200000, 12, thrust_direction)
+        launcher = Launcher(0.9, 0, "%stest.csv" % csvdir, "%stest" % kmldir,
+                            "%stest.csv" % frcdir, environment=env, thrust=thrust)
+        launcher.launch(8000, Position(math.radians(60), math.radians(45), 80))
+        stopwatch.stop()
+        env.plot_all_forces("%stest.csv" % frcdir)
 
     #
     locals()[scenario]()
