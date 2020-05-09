@@ -50,13 +50,13 @@ def run(scenario: str):
         for i in range(-85, 85):
             env = Environment(surface_altitude=lambda p: 80)
             thrust = ThrustForce(5000, fuel_flow, 150, 250000, 15, thrust_direction)
-            launcher = Launcher(math.pi / 4, 0, "%s/%d.csv" % (csvdir, i), "%s/%d" % (kmldir, i),
-                                "%s/%d.csv" % (frcdir, i),
+            launcher = Launcher(math.pi / 4, 0, "%s%d.csv" % (csvdir, i), "%s%d" % (kmldir, i),
+                                "%s%d.csv" % (frcdir, i),
                                 environment=env, thrust=thrust)
             launcher.launch(10000, Position(math.radians(i), math.radians(45), 80))
-            compress("%s/%d.csv" % (csvdir, i), "%s/%d.bz2" % (csvdir, i), name_inside_zip="%d.csv" % i,
+            compress("%s%d.csv" % (csvdir, i), "%s%d.bz2" % (csvdir, i), name_inside_zip="%d.csv" % i,
                      keep_original=False)
-            compress("%s/%d.csv" % (csvdir, i), "%s/%d.bz2" % (csvdir, i), name_inside_zip="%d.csv" % i,
+            compress("%s%d.csv" % (frcdir, i), "%s%d.bz2" % (frcdir, i), name_inside_zip="%d.csv" % i,
                      keep_original=False)
             stopwatch.lap()
         stopwatch.stop()
