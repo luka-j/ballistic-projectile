@@ -9,7 +9,8 @@ from projectile.util import sgn
 
 # noinspection PyUnresolvedReferences
 def intensity(projectile: Projectile, environment: Environment):
-    return environment.earth_angular_velocity**2 * environment.earth_radius * cos(projectile.position.lat)
+    return projectile.mass() * environment.earth_angular_velocity**2 \
+           * environment.earth_radius * cos(projectile.position.lat)
 
 
 class CentrifugalForce(Force):

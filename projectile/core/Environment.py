@@ -10,7 +10,6 @@ from projectile.data.CsvReaders import ForcesCsvReader
 from projectile.forces.CentrifugalForce import CentrifugalForce
 from projectile.forces.CoriolisForce import CoriolisForce
 from projectile.forces.DragForce import DragForce
-from projectile.forces.EotvosForce import EotvosForce
 from projectile.forces.Force import Force
 from projectile.forces.NewtonianGravity import NewtonianGravity
 from projectile.data.Plotter import simple_force_plot
@@ -29,7 +28,7 @@ class Environment:
         self.surface_altitude = surface_altitude
         self.std_gravity = std_gravity_acc
         self.atmosphere = atmosphere
-        self.forces: List[Force] = [NewtonianGravity(), DragForce(), CoriolisForce(), EotvosForce(), CentrifugalForce()]
+        self.forces: List[Force] = [NewtonianGravity(), DragForce(), CoriolisForce(), CentrifugalForce()]
 
     def add_force(self, force: Force) -> None:
         self.forces.append(force)
@@ -44,7 +43,7 @@ class Environment:
     # noinspection PyPep8Naming
     def density(self, altitude: float) -> float:
         """Works up to 86km; above that, things start falling apart (literally, air molecules start falling apart)"""
-        if altitude > 100000:
+        if altitude > 150000:
             return 0
         h = altitude
         rho_b = self.atmosphere.mass_density(h)

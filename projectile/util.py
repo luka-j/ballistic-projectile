@@ -51,7 +51,7 @@ def spherical_to_planar_coord(axis: int, intensity: float, pitch: float, yaw: fl
 
 class RollingStatistic:
     """Calculates rolling mean and standard deviation."""
-    PRINT_WARNINGS = True
+    PRINT_WARNINGS = False
     PRINT_DEBUG = False
 
     def __init__(self, window_size, ready_threshold=5):
