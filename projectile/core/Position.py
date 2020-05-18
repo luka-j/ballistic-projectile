@@ -2,6 +2,9 @@ import numpy as np
 
 
 class Position:
+    """
+    Class representing a position in the environment. A latitude/longitude/altitude float128 triplet.
+    """
     def __init__(self, lat, lon, alt):
         # this is CRUCIAL - forces such as Coriolis generate pretty small movement which is lost as a rounding error
         # when doing operations with position

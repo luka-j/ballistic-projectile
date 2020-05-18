@@ -8,6 +8,7 @@ from projectile.core.Position import Position
 
 
 def sgn(x) -> int:
+    """Sign of the number; -1, 0 or 1"""
     if x > 0:
         return 1
     if x < 0:
@@ -16,18 +17,22 @@ def sgn(x) -> int:
 
 
 def fp_eq(x: float, y: float) -> bool:
+    """Whether two floating point numbers are equal. Epsilon = 10^-12"""
     return fabs(x-y) < 10**-12
 
 
 def fp_lt(x: float, y: float) -> bool:
+    """Whether one floating point is lesser than the other and not equal."""
     return not fp_eq(x, y) and x < y
 
 
 def fp_gt(x: float, y: float) -> bool:
+    """Whether one floating point is lesser than the other and not equal."""
     return not fp_eq(x, y) and x > y
 
 
 def haversine(pos1: Position, pos2: Position, radius: float) -> float:
+    """Haversine formula. Distance between two lat/lon points in meters."""
     dlon = pos2.lon - pos1.lon
     dlat = pos2.lat - pos1.lat
     a = sin(dlat/2)**2 + cos(pos1.lat) * cos(pos2.lat) * sin(dlon/2)**2
@@ -35,6 +40,7 @@ def haversine(pos1: Position, pos2: Position, radius: float) -> float:
 
 
 def spherical_to_planar_coord(axis: int, intensity: float, pitch: float, yaw: float) -> float:
+    """Convert spherical coordinates (pitch/yaw) to planar, with specified intensity."""
     if axis == X_INDEX:
         return intensity * cos(yaw) * cos(pitch)
     if axis == Y_INDEX:
@@ -44,6 +50,7 @@ def spherical_to_planar_coord(axis: int, intensity: float, pitch: float, yaw: fl
 
 
 class RollingStatistic:
+    """Calculates rolling mean and standard deviation."""
     PRINT_WARNINGS = True
     PRINT_DEBUG = False
 
@@ -56,7 +63,7 @@ class RollingStatistic:
         self.elements = deque(maxlen=self.N)
         self.filled = 0
 
-    def update(self, new):
+    def update(self, new) -> None:
         if self.filled < self.N:
             oldavg = self.mean
             self.mean = (self.mean * self.filled + new) / (self.filled + 1)
@@ -79,28 +86,29 @@ class RollingStatistic:
             self.stddev = sqrt(self.variance)
             self.elements.append(new)
 
-    def is_outlier(self, sample, stddev_threshold=2):
+    def is_outlier(self, sample, stddev_threshold=2) -> bool:
         if self.filled < self.ready_threshold:
             return False
         return fabs(sample - self.mean) > self.stddev*stddev_threshold
 
 
 class Stopwatch:
+    """Measures and prints elapsed time between start and lap/stop."""
     def __init__(self):
         self.start_time = 0
         self.total_time = 0
         self.lap_count = 0
 
-    def start(self):
+    def start(self) -> None:
         self.start_time = time.time()
 
-    def lap(self):
+    def lap(self) -> None:
         lap_time = time.time() - self.start_time
         self.total_time += lap_time
         self.lap_count += 1
         print("Lap {}: {}, total: {}".format(self.lap_count, lap_time, self.total_time))
         self.start_time = time.time()
 
-    def stop(self):
+    def stop(self) -> None:
         self.total_time += (time.time() - self.start_time)
         print("Execution finished. Total time: {}".format(self.total_time))

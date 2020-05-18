@@ -7,16 +7,20 @@ from projectile.forces.Force import Force
 from projectile.util import spherical_to_planar_coord
 
 
-def follow_path(axis: int, force: float, pr: Projectile):
+def follow_path(axis: int, force: float, pr: Projectile) -> float:
     return spherical_to_planar_coord(axis, force, pr.pitch, pr.yaw)
 
 
 class ThrustForce(Force):
+    """
+    Defines thurst which moves the rocket. Main source of power. Consumes fuel to move.
+    """
     def total_intensity(self, projectile: Projectile, env: Environment) -> float:
-        if self.remaining_fuel <= 0:
+        if self.remaining_fuel <= 0:  # we don't have fuel, don't do anything
             return 0
-        if self.last_time == projectile.time:
+        if self.last_time == projectile.time:  # if we've already calculated a value for this time point, return that
             return self.last_result
+        # if not, consume fuel and calculate thrust
         self.last_time = projectile.time
         flow_rate = self.fuel_flow(projectile.time)
         burned_fuel = flow_rate * projectile.dt
@@ -26,8 +30,10 @@ class ThrustForce(Force):
         self.remaining_fuel -= burned_fuel
         projectile.lost_mass += burned_fuel
 
+        # Source: https://www.grc.nasa.gov/WWW/K-12/rocket/rockth.html
+        # thrust gained from exit velocity + thrust gained from pressure difference
         self.last_result = self.ejection_speed * flow_rate + \
-            (self.nozzle_pressure - env.pressure(projectile.position.alt)) * self.nozzle_exit_area
+                           (self.nozzle_pressure - env.pressure(projectile.position.alt)) * self.nozzle_exit_area
         return self.last_result
 
     def __init__(self, total_fuel: float, fuel_flow: Callable[[float], float], ejection_speed: float,

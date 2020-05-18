@@ -17,6 +17,10 @@ from projectile.data.Plotter import simple_force_plot
 
 
 class Environment:
+    """
+    Environment inside which projectile is launched. Defines all properties related to the earth (or any desired planet)
+    It contains a list of forces which are applied to every projectile flying in this environment.
+    """
 
     def __init__(self, earth_radius=6378137, earth_angular_velocity=7.2921159e-5, surface_altitude=lambda pos: 0,
                  std_gravity_acc=9.80665, atmosphere=StandardAtmosphere()):
@@ -61,6 +65,12 @@ class Environment:
         return rho / self.atmosphere.molar_mass(altitude) * R * temp
 
     def get_forces_intensities(self, projectile) -> np.array:
+        """
+        Returns a matrix of all forces acting on the projectile. Matrix is of shape n x 3, where n is number of forces
+        in this environment.
+        :param projectile: projectile on which forces act
+        :return: intensity matrix
+        """
         intensities = np.zeros([len(self.forces), 3], "float128")
         if DEBUG:
             print("Position: {}, {}, {}"
@@ -81,7 +91,7 @@ class Environment:
         return Projectile(self, mass, [0, 0, 0], initial_position, cross_section, drag_coef,
                           forces_writer=forces_writer)
 
-    def plot_all_forces(self, forces_filename: str):
+    def plot_all_forces(self, forces_filename: str) -> None:
         i = 0
         for force in self.forces:
             simple_force_plot(ForcesCsvReader(forces_filename), i, type(force).__name__)

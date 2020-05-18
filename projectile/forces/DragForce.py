@@ -13,6 +13,9 @@ def intensity(projectile: Projectile, environment: Environment, velocity: float,
 
 
 class DragForce(Force):
+    """
+    Defines atmospheric drag. Atmosphere density is calculated inside Environment class.
+    """
     def __init__(self):
         super().__init__(lambda p, env: -p.directions[0] * intensity(p, env, p.velocities[X_INDEX], X_INDEX),
                          lambda p, env: -p.directions[1] * intensity(p, env, p.velocities[Y_INDEX], Y_INDEX),

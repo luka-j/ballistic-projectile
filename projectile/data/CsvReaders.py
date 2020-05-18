@@ -5,6 +5,9 @@ from projectile.data.DataPoints import ProjectileDataPoint, ForcesDataPoint
 
 
 class ProjectileCsvReader:
+    """
+    Reads projectile data file and returns ProjectileDataPoints describing projectile state at each moment.
+    """
     def __init__(self, filename: Text):
         self.file = open(filename, "r")
         self.read_lines = 0
@@ -26,6 +29,9 @@ class ProjectileCsvReader:
 
 
 class ForcesCsvReader:
+    """
+    Reads forces data file and returns ForcesDataPoint describing each force's intensity at each moment.
+    """
     def __init__(self, filename: Text):
         self.file = open(filename, "r")
         self.prev_line = None

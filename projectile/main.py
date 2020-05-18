@@ -4,6 +4,13 @@ from projectile.scenarios import run
 from projectile.data.KmlWriter import convert_csv_to_kmz
 import sys
 
+"""
+This script only does cmd argument parsing. Valid arguments:
+run  - start a scenario (see scenarios.py)
+plot - create a plot of forces from a Forces CSV
+kmz  - convert Projectile CSV to KMZ format
+"""
+
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print("USAGE: <command> <argument> [...]")

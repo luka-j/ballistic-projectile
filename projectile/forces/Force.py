@@ -8,6 +8,11 @@ from projectile.core.Projectile import Projectile
 
 # noinspection PyUnresolvedReferences
 class Force:
+    """
+    Base class for all forces. Subclass this to introduce new forces. Three lambdas need to be provided for this to
+    work: first one will calculate intensity in x direction (eastward), second one in y direction (northward) and the
+    last one in z direction (upward).
+    """
 
     def __init__(self, x: Callable[[Projectile, Environment], float],
                  y: Callable[[Projectile, Environment], float],

@@ -16,7 +16,7 @@ if not os.path.exists("scenario_data"):
     os.mkdir("scenario_data")
 
 
-def init_scenario(name: str) -> (str, str, str, Stopwatch):
+def init_scenario(name: str) -> (str, str, str, Stopwatch):  # create files and initialize Stopwatch
     os.mkdir("scenario_data/{}/".format(name))
     csvdir = "scenario_data/{}/csv/".format(name)
     kmldir = "scenario_data/{}/kml/".format(name)
@@ -29,8 +29,17 @@ def init_scenario(name: str) -> (str, str, str, Stopwatch):
 
 
 def run(scenario: str) -> None:
+    """
+    Run a scenario. Invokes a method by name. All scenarios are defined in this function with local scope.
+    :param scenario: scenario to be run
+    :return: nothing; scenario is run and its output is probably in a file
+    """
 
-    def long_distance_eastward_across_meridian():
+    def long_distance_eastward_across_meridian() -> None:
+        """
+        Launch long-distance flights to the east, varying the latitude, across the same meridian. Total 170 flights.
+        :return: nothing
+        """
         print("Running long_distance_eastward_across_meridian")
 
         def fuel_flow(t: float):
@@ -65,7 +74,11 @@ def run(scenario: str) -> None:
             stopwatch.lap()
         stopwatch.stop()
 
-    def vary_yaw():
+    def vary_yaw() -> None:
+        """
+        Launch long-distance flights with pi/4 pitch with varying yaws. Total 71 flights.
+        :return: nothing
+        """
         print("Running vary_yaw")
 
         def fuel_flow(t: float):
@@ -99,7 +112,11 @@ def run(scenario: str) -> None:
                      keep_original=False)
             stopwatch.lap()
 
-    def vary_pitch():
+    def vary_pitch() -> None:
+        """
+        Launch long-distance flights to the east with varying pitches (8-80). Total 36 flights.
+        :return: nothing
+        """
         print("Running vary_pitch")
 
         def fuel_flow(t: float):
@@ -133,7 +150,11 @@ def run(scenario: str) -> None:
                      keep_original=False)
             stopwatch.lap()
 
-    def test():
+    def test() -> None:
+        """
+        Test scenario. Default for fiddling around.
+        :return: nothing
+        """
         print("Running test")
         def fuel_flow(t: float):
             if t < 1:
@@ -165,4 +186,4 @@ def run(scenario: str) -> None:
         env.plot_all_forces("%stest.csv" % frcdir)
 
     #
-    locals()[scenario]()
+    locals()[scenario]()  # call the appropriate method

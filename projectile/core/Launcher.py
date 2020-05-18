@@ -9,14 +9,28 @@ from projectile.forces.ThrustForce import follow_path, ThrustForce
 from projectile.util import spherical_to_planar_coord
 
 
-def default_fuel_flow(t: float):
+def default_fuel_flow(t: float) -> float:
     if t < 2:
         return 600
     return 100
 
 
 class Launcher:
-    def default_thrust_direction(self, axis: int, force: float, pr: Projectile):
+    """
+    Utility class for launching projectiles. Takes care of setting up environment, projectiles and file I/O with
+    specified values and/or sensible defaults and flying the projectile (main loop).
+    """
+
+    def default_thrust_direction(self, axis: int, force: float, pr: Projectile) -> float:
+        """
+        Sensible default for thrust direction. First two seconds it's flying in the same direction as it was launched.
+        After then, if pitch is < 0.15, it attempts to correct it and flies upwards +0.17rad (relative to current).
+        Otherwise, keeps the same direction.
+        :param axis: axis for which thrust direction is caluclated
+        :param force: total force intensity
+        :param pr: projectile
+        :return: thrust direction for the specified axis
+        """
         if pr.time < 2:
             return spherical_to_planar_coord(axis, force, self.pitch, self.yaw)
         if pr.pitch < 0.15:
@@ -39,6 +53,15 @@ class Launcher:
 
     def launch(self, mass: float, position: Position, velocity=0, cross_section=lambda axis, pitch, yaw: 20,
                drag_coeff=lambda axis, pitch, yaw: 0.1):
+        """
+        Launch the projectile and fly it until it crashes.
+        :param mass: projectile mass
+        :param position: initial position
+        :param velocity: initial velocity
+        :param cross_section: cross section area
+        :param drag_coeff: drag coefficient
+        :return:
+        """
         if self.forces_csv_filename is not None:
             forces_writer = ForcesCsvWriter(self.forces_csv_filename)
             forces_writer.write_header()

@@ -5,6 +5,9 @@ from projectile.forces.Force import Force
 
 
 class EotvosForce(Force):
+    """
+    Vertical component of CoriolisForce. Acts upwards when going east, downwards when going west.
+    """
     def __init__(self):
         super().__init__(lambda pr, env: 0,
                          lambda pr, env: 0,

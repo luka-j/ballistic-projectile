@@ -10,6 +10,12 @@ from projectile.util import fp_gt
 
 
 def convert_csv_to_kmz(csv_name: str, kml_name: str):
+    """
+    Converts a Projectile CSV file to KMZ file which can then be loaded to e.g. Google Earth.
+    :param csv_name: filename of projectile CSV file (with extension)
+    :param kml_name: filename of KMZ file to be created - WITHOUT extension
+    :return:
+    """
     kml = KmlWriter(kml_name + ".kml")
     csv = ProjectileCsvReader(csv_name)
     kml.convert(csv, sample_rate=10)
@@ -17,6 +23,10 @@ def convert_csv_to_kmz(csv_name: str, kml_name: str):
 
 
 class KmlWriter:
+    """
+    Write projectile flight to a KML file which can be loaded to e.g. Google Eath
+    (can be zipped and then becomes KMZ file).
+    """
     def __init__(self, filename: Text, peak_band=0.2, fuel_band=10, altitude_mode="absolute"):
         self.file = open(filename, "w")
         self.date = datetime.now()

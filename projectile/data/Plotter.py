@@ -2,6 +2,8 @@ from projectile.data.CsvReaders import ForcesCsvReader
 import matplotlib.pyplot as plt
 import numpy as np
 
+"""Utility methods for plotting"""
+
 
 def extract_force(reader: ForcesCsvReader, index: int):
     point = reader.read()

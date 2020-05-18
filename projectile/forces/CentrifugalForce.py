@@ -13,6 +13,9 @@ def intensity(projectile: Projectile, environment: Environment):
 
 
 class CentrifugalForce(Force):
+    """
+    Centrifugal force acts towards the equator and upwards.
+    """
     def __init__(self):
         super().__init__(lambda pr, env: 0,
                          lambda pr, env: intensity(pr, env) * (-sgn(pr.position.lat)) * cos(pr.position.lat),

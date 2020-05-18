@@ -5,6 +5,9 @@ from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
 
 
 class ProjectileCsvWriter:
+    """
+    Write projectile's state to CSV file.
+    """
     def __init__(self, filename: Text):
         self.file = open(filename, "w")
 
@@ -21,6 +24,9 @@ class ProjectileCsvWriter:
 
 
 class ForcesCsvWriter:
+    """
+    Write forces' intensities to CSV file.
+    """
     def __init__(self, filename: Text):
         self.file = open(filename, "w")
 
