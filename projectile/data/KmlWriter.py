@@ -27,7 +27,7 @@ class KmlWriter:
     Write projectile flight to a KML file which can be loaded to e.g. Google Eath
     (can be zipped and then becomes KMZ file).
     """
-    def __init__(self, filename: Text, peak_band=0.2, fuel_band=10, altitude_mode="absolute"):
+    def __init__(self, filename: Text, peak_band=10, fuel_band=60, altitude_mode="absolute"):
         self.file = open(filename, "w")
         self.date = datetime.now()
         self.peak_band = peak_band
@@ -74,7 +74,7 @@ class KmlWriter:
         else:
             self.file.write("<Placemark>")
             self.file.write("<TimeSpan><begin>{}</begin></TimeSpan>".format(time.isoformat()))
-            if self.fuel_band > data.z_speed > -self.fuel_band or (data.z_speed <= 0 and not self.wrote_peak):
+            if self.peak_band > data.z_speed > -self.peak_band or (data.z_speed <= 0 and not self.wrote_peak):
                 self.file.write("<styleUrl>#peak</styleUrl>")
                 self.wrote_peak = True
             if 0 < data.remaining_fuel <= self.fuel_band or (data.remaining_fuel == 0 and not self.wrote_fuel):
