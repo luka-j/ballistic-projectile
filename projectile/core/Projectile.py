@@ -8,7 +8,7 @@ import numpy as np
 from projectile.core.Constants import X_INDEX, Y_INDEX, Z_INDEX
 from projectile.core.Position import Position
 from projectile.data.DataPoints import ProjectileDataPoint, ForcesDataPoint
-from projectile.util import sgn, RollingStatistic, haversine, fp_eq
+from projectile.util import sgn, RollingStatistic, haversine, fp_eq, spherical_to_planar_coord
 
 
 class Projectile:
@@ -152,10 +152,11 @@ class Projectile:
                 print("Crossing the pole: change ratio is %f" % change_ratio)
                 # so now that we've crossed the pole, we want to reverse Vx and Vy and change longitude so we continue
                 # flying 'straight'. We're basically throwing away this iteration and using the data from the previous.
-                self.velocities[Y_INDEX] = -old_vy
                 self.crossed_the_pole = True  # this will prevent crossing the pole again if we're still too close
-                self.position.lon = divmod(self.position.lon + pi, 2 * pi)[1]
-                self.velocities[X_INDEX] = -self.velocities[X_INDEX]
+                self.position.lon = divmod((old_lon + pi), (2 * pi))[1] - 2*pi
+                self.yaw = self.yaw - pi % (sgn(self.yaw-pi) * 2 * pi)
+                self.velocities[X_INDEX] = spherical_to_planar_coord(X_INDEX, self.total_velocity, self.pitch, self.yaw)
+                self.velocities[Y_INDEX] = spherical_to_planar_coord(Y_INDEX, self.total_velocity, self.pitch, self.yaw)
                 return  # don't update X velocity!
             elif actual_distance < self.distance_stats.mean:
                 # Vy changed a lot, but we're far away from the pole; can happen in e.g. polar circle even if we're not

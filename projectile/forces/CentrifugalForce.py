@@ -18,5 +18,5 @@ class CentrifugalForce(Force):
     """
     def __init__(self):
         super().__init__(lambda pr, env: 0,
-                         lambda pr, env: intensity(pr, env) * sin(pr.position.lat),
+                         lambda pr, env: intensity(pr, env) * (-sin(pr.position.lat)),
                          lambda pr, env: intensity(pr, env) * cos(pr.position.lat))
