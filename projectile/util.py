@@ -79,7 +79,7 @@ class RollingStatistic:
             newvar = self.variance + (new-old) * (new - self.mean + old - oldavg) / (self.N - 1)
             if newvar < 0 and RollingStatistic.PRINT_WARNINGS:
                 print("Warning: Variance underflow!")
-            else:
+            elif newvar > 0:
                 self.variance = newvar
             if RollingStatistic.PRINT_DEBUG:
                 print("New sample: {}, Mean: {}, variance: {}".format(new, self.mean, self.variance))

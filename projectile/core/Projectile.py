@@ -39,7 +39,7 @@ class Projectile:
         self.pitch = 0
         self.yaw = 0
         self.dt = 0
-        self.thrust = None
+        self.thrust = []
         self.distance_stats = RollingStatistic(distance_rolling_window)
 
     def launch_at_angle(self, pitch: float, yaw: float, velocity: float) -> None:
@@ -78,7 +78,7 @@ class Projectile:
         """
         self.initial_mass += thrust.remaining_fuel
         self.environment.add_force(thrust)
-        self.thrust = thrust
+        self.thrust.append(thrust)
 
     def advance(self, dt) -> None:
         """
@@ -200,7 +200,7 @@ class Projectile:
         """
         fuel = 0
         if self.thrust is not None:
-            fuel = self.thrust.remaining_fuel
+            fuel = np.sum(list(map(lambda t: t.remaining_fuel, self.thrust)))
         return ProjectileDataPoint(self.time, self.distance_travelled, self.position.lat, self.position.lon, self.position.alt,
                                    self.velocities[X_INDEX], self.velocities[Y_INDEX], self.velocities[Z_INDEX],
                                    self.pitch, self.yaw, fuel)
