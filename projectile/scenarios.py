@@ -150,12 +150,40 @@ def run(scenario: str) -> None:
                      keep_original=False)
             stopwatch.lap()
 
+    def long_distance() -> None:
+        print("Running long_distance")
+
+        def thrust_direction(axis: int, force: float, pr: Projectile):
+            if pr.time < 1:
+                return spherical_to_planar_coord(axis, force, math.pi / 4, math.pi)
+            if (pr.position.alt > 100000 or pr.velocities[Z_INDEX] > 3500) and pr.pitch > 0.2:
+                spherical_to_planar_coord(axis, force, pr.pitch - 0.2, pr.yaw)
+            if pr.pitch < 0.15:
+                spherical_to_planar_coord(axis, force, pr.pitch + 0.1, pr.yaw)
+            return follow_path(axis, force, pr)
+        if os.path.exists("scenario_data/long_distance/"):
+            shutil.rmtree("scenario_data/long_distance/")
+        csvdir, kmldir, frcdir, stopwatch = init_scenario("long_distance")
+        stopwatch.start()
+
+        env = Environment(surface_altitude=lambda p: 80)
+        thrust = [ThrustForce(4000, lambda t: 120, 150, 200000, 12, thrust_direction),
+                  ThrustForce(1800, lambda t: 150, 150, 200000, 13, thrust_direction),
+                  ThrustForce(1200, lambda t: 200, 200, 300000, 15, thrust_direction),
+                  ThrustForce(1200, lambda t: 200, 200, 300000, 15, thrust_direction)]
+        launcher = Launcher(math.pi/4, math.pi, "%sdata.csv" % csvdir, "%sdata" % kmldir,
+                            "%sdata.csv" % frcdir, environment=env, thrust=thrust)
+        launcher.launch(10000, Position(math.radians(10), math.radians(-10), 80))
+        stopwatch.stop()
+        env.plot_all_forces("%sdata.csv" % frcdir)
+
     def test() -> None:
         """
         Test scenario. Default for fiddling around.
         :return: nothing
         """
         print("Running test")
+
         def fuel_flow(t: float):
             if t < 1:
                 return 600
@@ -165,7 +193,7 @@ def run(scenario: str) -> None:
 
         def thrust_direction(axis: int, force: float, pr: Projectile):
             if pr.time < 1.2:
-                return spherical_to_planar_coord(axis, force, math.pi / 4, 0)
+                return spherical_to_planar_coord(axis, force, 0.9, 0)
             if (pr.position.alt > 100000 or pr.velocities[Z_INDEX] > 3500) and pr.pitch > 0.2:
                 spherical_to_planar_coord(axis, force, pr.pitch - 0.12, pr.yaw)
             if pr.pitch < 0.15:
@@ -184,6 +212,8 @@ def run(scenario: str) -> None:
         launcher.launch(8000, Position(math.radians(60), math.radians(45), 80))
         stopwatch.stop()
         env.plot_all_forces("%stest.csv" % frcdir)
+
+
 
     #
     locals()[scenario]()  # call the appropriate method

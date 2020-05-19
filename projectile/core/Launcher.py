@@ -1,4 +1,5 @@
 import os
+from typing import Union, List
 
 from projectile.core.Environment import Environment
 from projectile.core.Position import Position
@@ -38,7 +39,7 @@ class Launcher:
         return follow_path(axis, force, pr)
 
     def __init__(self, pitch, yaw, csv_filename, kmz_filename, forces_csv_filename=None, dt=0.01, keep_csv=True,
-                 environment: Environment = None, thrust: ThrustForce = None):
+                 environment: Environment = None, thrust: Union[ThrustForce, List[ThrustForce]] = None):
         self.pitch = pitch
         self.yaw = yaw
         self.dt = dt
@@ -70,7 +71,11 @@ class Launcher:
         projectile = self.environment.create_projectile(mass, position, cross_section, drag_coeff, forces_writer)
         projectile.launch_at_angle(self.pitch, self.yaw, velocity)
         if self.thrust is not None:
-            projectile.add_thrust(self.thrust)
+            if isinstance(self.thrust, list):
+                for th in self.thrust:
+                    projectile.add_thrust(th)
+            else:
+                projectile.add_thrust(self.thrust)
 
         writer = ProjectileCsvWriter(self.csv_filename)
         writer.write_header()
