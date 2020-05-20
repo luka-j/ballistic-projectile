@@ -97,7 +97,7 @@ def run(scenario: str) -> None:
         def iteration(yaw: int):
             def thrust_direction(axis: int, force: float, pr: Projectile):
                 if pr.time < 1.2:
-                    return spherical_to_planar_coord(axis, force, math.pi / 4, yaw)
+                    return spherical_to_planar_coord(axis, force, math.pi / 4, math.radians(yaw))
                 if (pr.position.alt > 100000 or pr.velocities[Z_INDEX] > 4000) and pr.pitch > 0.2:
                     spherical_to_planar_coord(axis, force, pr.pitch - 0.15, pr.yaw)
                 if pr.pitch < 0.15:
@@ -106,7 +106,7 @@ def run(scenario: str) -> None:
 
             env = Environment(surface_altitude=lambda p: 80)
             thrust = ThrustForce(5000, fuel_flow, 150, 250000, 15, thrust_direction)
-            launcher = Launcher(math.pi / 4, yaw, "%s%d.csv" % (csvdir, yaw), "%s%d" % (kmldir, yaw),
+            launcher = Launcher(math.pi / 4, math.radians(yaw), "%s%d.csv" % (csvdir, yaw), "%s%d" % (kmldir, yaw),
                                 "%s%d.csv" % (frcdir, yaw), environment=env, thrust=thrust)
             launcher.launch(10000, Position(math.radians(45), math.radians(45), 80))
             # compress("%s%d.csv" % (csvdir, yaw), "%s%d.bz2" % (csvdir, yaw), name_inside_zip="%d.csv" % yaw,
