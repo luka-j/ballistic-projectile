@@ -1,6 +1,7 @@
 import math
 import os
 import shutil
+from joblib import Parallel, delayed
 
 from projectile.core.Constants import Z_INDEX
 from projectile.core.Environment import Environment
@@ -93,7 +94,7 @@ def run(scenario: str) -> None:
         csvdir, kmldir, frcdir, stopwatch = init_scenario("ld_vary_yaw")
         stopwatch.start()
 
-        for yaw in range(0, 359, 5):
+        def iteration(yaw: int):
             def thrust_direction(axis: int, force: float, pr: Projectile):
                 if pr.time < 1.2:
                     return spherical_to_planar_coord(axis, force, math.pi / 4, yaw)
@@ -108,11 +109,14 @@ def run(scenario: str) -> None:
             launcher = Launcher(math.pi / 4, yaw, "%s%d.csv" % (csvdir, yaw), "%s%d" % (kmldir, yaw),
                                 "%s%d.csv" % (frcdir, yaw), environment=env, thrust=thrust)
             launcher.launch(10000, Position(math.radians(45), math.radians(45), 80))
-            compress("%s%d.csv" % (csvdir, yaw), "%s%d.bz2" % (csvdir, yaw), name_inside_zip="%d.csv" % yaw,
-                     keep_original=False)
-            compress("%s%d.csv" % (frcdir, yaw), "%s%d.bz2" % (frcdir, yaw), name_inside_zip="%d.csv" % yaw,
-                     keep_original=False)
+            # compress("%s%d.csv" % (csvdir, yaw), "%s%d.bz2" % (csvdir, yaw), name_inside_zip="%d.csv" % yaw,
+            #         keep_original=False)
+            # compress("%s%d.csv" % (frcdir, yaw), "%s%d.bz2" % (frcdir, yaw), name_inside_zip="%d.csv" % yaw,
+            #         keep_original=False)
             stopwatch.lap()
+
+        Parallel(-1)(delayed(iteration)(i) for i in range(0, 359, 5))
+
 
     def vary_pitch() -> None:
         """
