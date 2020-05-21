@@ -10,12 +10,6 @@ from projectile.forces.ThrustForce import follow_path, ThrustForce
 from projectile.util import spherical_to_planar_coord
 
 
-def default_fuel_flow(t: float) -> float:
-    if t < 2:
-        return 600
-    return 100
-
-
 class Launcher:
     """
     Utility class for launching projectiles. Takes care of setting up environment, projectiles and file I/O with
