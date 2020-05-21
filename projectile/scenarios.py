@@ -1,7 +1,6 @@
 import math
 import os
 import shutil
-from typing import List
 
 from joblib import Parallel, delayed
 
@@ -10,7 +9,6 @@ from projectile.core.Environment import Environment
 from projectile.core.Launcher import Launcher
 from projectile.core.Position import Position
 from projectile.core.Projectile import Projectile
-from projectile.data.ZipIO import compress
 from projectile.forces.CentrifugalForce import CentrifugalForce
 from projectile.forces.CoriolisForce import CoriolisForce
 from projectile.forces.ThrustForce import follow_path, ThrustForce
@@ -41,7 +39,7 @@ def run(scenario: str, args=None) -> None:
     :return: nothing; scenario is run and its output is probably in a file
     """
 
-    def long_distance_eastward_across_meridian() -> None:
+    def vary_latitude() -> None:
         """
         Launch long-distance flights to the east, varying the latitude, across the same meridian. Total 170 flights.
         :return: nothing
@@ -67,17 +65,19 @@ def run(scenario: str, args=None) -> None:
         csvdir, kmldir, frcdir, stopwatch = init_scenario("ld_eastward_latitude")
         stopwatch.start()
 
-        for i in range(-85, 85):
+        def iteration(latitude: float):
             env = Environment(surface_altitude=lambda p: 80)
             thrust = ThrustForce(5000, fuel_flow, 150, 250000, 15, thrust_direction)
-            launcher = Launcher(math.pi / 4, 0, "%s%d.csv" % (csvdir, i), "%s%d" % (kmldir, i),
-                                "%s%d.csv" % (frcdir, i), environment=env, thrust=thrust)
-            launcher.launch(10000, Position(math.radians(i), math.radians(45), 80))
-            compress("%s%d.csv" % (csvdir, i), "%s%d.bz2" % (csvdir, i), name_inside_zip="%d.csv" % i,
-                     keep_original=False)
-            compress("%s%d.csv" % (frcdir, i), "%s%d.bz2" % (frcdir, i), name_inside_zip="%d.csv" % i,
-                     keep_original=False)
+            launcher = Launcher(math.pi / 4, 0, "%s%d.csv" % (csvdir, latitude), "%s%d" % (kmldir, latitude),
+                                "%s%d.csv" % (frcdir, latitude), environment=env, thrust=thrust)
+            launcher.launch(10000, Position(math.radians(latitude), math.radians(45), 80))
             stopwatch.lap()
+
+        core_number = -1
+        if args is not None and len(args) > 0:
+            core_number = int(args[0])
+        Parallel(core_number)(delayed(iteration)(i) for i in range(-85, 85))
+
         stopwatch.stop()
 
     def vary_yaw() -> None:
@@ -125,7 +125,7 @@ def run(scenario: str, args=None) -> None:
 
     def vary_pitch() -> None:
         """
-        Launch long-distance flights to the east with varying pitches (8-80). Total 36 flights.
+        Launch long-distance flights to the east with varying pitches (8-82). Total 38 flights.
         :return: nothing
         """
         print("Running {}".format(scenario))
@@ -140,7 +140,7 @@ def run(scenario: str, args=None) -> None:
         csvdir, kmldir, frcdir, stopwatch = init_scenario("ld_vary_pitch")
         stopwatch.start()
 
-        for pitch in range(8, 80, 2):
+        def iteration(pitch: float):
             def thrust_direction(axis: int, force: float, pr: Projectile):
                 if pr.time < 1.2:
                     return spherical_to_planar_coord(axis, force, math.radians(pitch), 0)
@@ -155,11 +155,13 @@ def run(scenario: str, args=None) -> None:
             launcher = Launcher(math.radians(pitch), 0, "%s%d.csv" % (csvdir, pitch), "%s%d" % (kmldir, pitch),
                                 "%s%d.csv" % (frcdir, pitch), environment=env, thrust=thrust)
             launcher.launch(10000, Position(math.radians(45), math.radians(45), 80))
-            compress("%s%d.csv" % (csvdir, pitch), "%s%d.bz2" % (csvdir, pitch), name_inside_zip="%d.csv" % pitch,
-                     keep_original=False)
-            compress("%s%d.csv" % (frcdir, pitch), "%s%d.bz2" % (frcdir, pitch), name_inside_zip="%d.csv" % pitch,
-                     keep_original=False)
             stopwatch.lap()
+
+        core_number = -1
+        if args is not None and len(args) > 0:
+            core_number = int(args[0])
+        Parallel(core_number)(delayed(iteration)(i) for i in range(8, 82, 2))
+        stopwatch.stop()
 
     def long_distance() -> None:
         print("Running {}".format(scenario))
