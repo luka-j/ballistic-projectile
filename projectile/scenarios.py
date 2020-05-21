@@ -1,6 +1,8 @@
 import math
 import os
 import shutil
+from typing import List
+
 from joblib import Parallel, delayed
 
 from projectile.core.Constants import Z_INDEX
@@ -31,10 +33,11 @@ def init_scenario(name: str) -> (str, str, str, Stopwatch):  # create files and 
     return csvdir, kmldir, frcdir, stopwatch
 
 
-def run(scenario: str) -> None:
+def run(scenario: str, args=None) -> None:
     """
     Run a scenario. Invokes a method by name. All scenarios are defined in this function with local scope.
     :param scenario: scenario to be run
+    :param args: arguments to be passed to the scenario
     :return: nothing; scenario is run and its output is probably in a file
     """
 
@@ -43,7 +46,7 @@ def run(scenario: str) -> None:
         Launch long-distance flights to the east, varying the latitude, across the same meridian. Total 170 flights.
         :return: nothing
         """
-        print("Running long_distance_eastward_across_meridian")
+        print("Running {}".format(scenario))
 
         def fuel_flow(t: float):
             if t < 1:
@@ -82,7 +85,7 @@ def run(scenario: str) -> None:
         Launch long-distance flights with pi/4 pitch with varying yaws. Total 71 flights.
         :return: nothing
         """
-        print("Running vary_yaw")
+        print("Running {}".format(scenario))
 
         def fuel_flow(t: float):
             if t < 1:
@@ -108,22 +111,24 @@ def run(scenario: str) -> None:
             thrust = ThrustForce(5000, fuel_flow, 150, 250000, 15, thrust_direction)
             launcher = Launcher(math.pi / 4, math.radians(yaw), "%s%d.csv" % (csvdir, yaw), "%s%d" % (kmldir, yaw),
                                 "%s%d.csv" % (frcdir, yaw), environment=env, thrust=thrust)
-            launcher.launch(10000, Position(math.radians(45), math.radians(45), 80))
+            launcher.launch(10000, Position(math.radians(0), math.radians(15), 80))
             # compress("%s%d.csv" % (csvdir, yaw), "%s%d.bz2" % (csvdir, yaw), name_inside_zip="%d.csv" % yaw,
             #         keep_original=False)
             # compress("%s%d.csv" % (frcdir, yaw), "%s%d.bz2" % (frcdir, yaw), name_inside_zip="%d.csv" % yaw,
             #         keep_original=False)
             stopwatch.lap()
 
-        Parallel(-1)(delayed(iteration)(i) for i in range(0, 359, 5))
-
+        core_number = -1
+        if args is not None and len(args) > 0:
+            core_number = int(args[0])
+        Parallel(core_number)(delayed(iteration)(i) for i in range(0, 359, 5))
 
     def vary_pitch() -> None:
         """
         Launch long-distance flights to the east with varying pitches (8-80). Total 36 flights.
         :return: nothing
         """
-        print("Running vary_pitch")
+        print("Running {}".format(scenario))
 
         def fuel_flow(t: float):
             if t < 1:
@@ -157,7 +162,7 @@ def run(scenario: str) -> None:
             stopwatch.lap()
 
     def long_distance() -> None:
-        print("Running long_distance")
+        print("Running {}".format(scenario))
 
         def thrust_direction(axis: int, force: float, pr: Projectile):
             if pr.time < 1:
@@ -188,7 +193,7 @@ def run(scenario: str) -> None:
         Test scenario. Default for fiddling around.
         :return: nothing
         """
-        print("Running test")
+        print("Running {}".format(scenario))
 
         def fuel_flow(t: float):
             if t < 1:
@@ -224,7 +229,7 @@ def run(scenario: str) -> None:
         Start really north. Cross the pole and carry on.
         :return: nothing
         """
-        print("Running test")
+        print("Running {}".format(scenario))
 
         def fuel_flow(t: float):
             if t < 1:

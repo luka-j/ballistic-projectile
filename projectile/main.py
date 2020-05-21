@@ -18,7 +18,7 @@ if __name__ == '__main__':
         exit(1)
 
     if sys.argv[1] == "run":
-        run(sys.argv[2])
+        run(sys.argv[2], sys.argv[3:])
         print("Done!")
     elif sys.argv[1] == "plot":
         env = Environment()

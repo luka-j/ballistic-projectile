@@ -141,7 +141,10 @@ class Projectile:
         # our first and largest problem is detecting whether we've crossed the pole. I don't know a nice way for this,
         # so we use the ugly way: statistics and prayers.
         # ideally, change_radio should be 0 (meaning Vy won't be corrected)
-        change_ratio = fabs(self.velocities[Y_INDEX] / old_vy - 1)
+        if old_vy != 0:
+            change_ratio = fabs(self.velocities[Y_INDEX] / old_vy - 1)
+        else:
+            change_ratio = fabs(self.velocities[Y_INDEX])
         if change_ratio > self.vy_corrective_change_threshold:  # oops, we've modified Vy too much
             actual_distance = haversine(self.position, Position(old_lat, old_lon, 0), radius)
             if self.crossed_the_pole:  # if we've crossed the pole recently, we definitely don't want to do it again
