@@ -9,7 +9,6 @@ from projectile.core.Environment import Environment
 from projectile.core.Launcher import Launcher
 from projectile.core.Position import Position
 from projectile.core.Projectile import Projectile
-from projectile.forces.CentrifugalForce import CentrifugalForce
 from projectile.forces.CoriolisForce import CoriolisForce
 from projectile.forces.ThrustForce import follow_path, ThrustForce
 from projectile.util import spherical_to_planar_coord, Stopwatch
@@ -46,7 +45,7 @@ def run(scenario: str, args=None) -> None:
         """
         print("Running {}".format(scenario))
 
-        def fuel_flow(t: float):
+        def fuel_flow(t: float):  # this is not very realistic-see long_distance scenario for a better multi-engine sim
             if t < 1:
                 return 1000
             if t < 3:
@@ -87,7 +86,7 @@ def run(scenario: str, args=None) -> None:
         """
         print("Running {}".format(scenario))
 
-        def fuel_flow(t: float):
+        def fuel_flow(t: float):  # this is not very realistic-see long_distance scenario for a better multi-engine sim
             if t < 1:
                 return 1000
             if t < 3:
@@ -130,7 +129,7 @@ def run(scenario: str, args=None) -> None:
         """
         print("Running {}".format(scenario))
 
-        def fuel_flow(t: float):
+        def fuel_flow(t: float):  # this is not very realistic-see long_distance scenario for a better multi-engine sim
             if t < 1:
                 return 1000
             if t < 3:
@@ -256,7 +255,6 @@ def run(scenario: str, args=None) -> None:
 
         env = Environment(surface_altitude=lambda p: 80)
         env.remove_force(CoriolisForce())
-        env.remove_force(CentrifugalForce())
         thrust = ThrustForce(4000, fuel_flow, 150, 200000, 12, thrust_direction)
         launcher = Launcher(math.pi/4, math.pi/2, "%stest.csv" % csvdir, "%stest" % kmldir,
                             "%stest.csv" % frcdir, environment=env, thrust=thrust, dt=0.1)
