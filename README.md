@@ -29,3 +29,7 @@ Plot forces using data file generated after running vary_yaw scenario:
 ```shell script
 python3 projectile/main.py plot scenario_data/ld_vary_yaw/forces/0.csv
 ```
+Make sure this directory is in your Python path so packages can be picked up
+correctly. This can be done by setting PYTHONPATH environment variable to . 
+if you're already positioned here (easiest way is prefixing the command by 
+PYTHONPATH=., e.g. `PYTHONPATH=. python3 projectile/main.py run test`).
