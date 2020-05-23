@@ -148,11 +148,11 @@ class Projectile:
         if change_ratio > self.vy_corrective_change_threshold:  # oops, we've modified Vy too much
             actual_distance = haversine(self.position, Position(old_lat, old_lon, 0), radius)
             if self.crossed_the_pole:  # if we've crossed the pole recently, we definitely don't want to do it again
-                print("Warning! V_y has too extreme oscillations: %f" % change_ratio)
+                print(f"Warning! V_y has too extreme oscillations: {change_ratio}")
             elif actual_distance < self.distance_stats.mean and self.distance_stats.is_outlier(actual_distance):
                 # if we've travelled significantly less than usual (i.e. in y direction), assume we've crossed the pole
                 # conceptually simple, practically not-really-definable, but surprisingly effective
-                print("Crossing the pole: change ratio is %f" % change_ratio)
+                print(f"Crossing the pole: change ratio is {change_ratio}f")
                 # so now that we've crossed the pole, we want to reverse Vx and Vy and change longitude so we continue
                 # flying 'straight'. We're basically throwing away this iteration and using the data from the previous.
                 self.crossed_the_pole = True  # this will prevent crossing the pole again if we're still too close
@@ -164,7 +164,7 @@ class Projectile:
             elif actual_distance < self.distance_stats.mean:
                 # Vy changed a lot, but we're far away from the pole; can happen in e.g. polar circle even if we're not
                 # flying over the pole itself.
-                print("Warning: Vy has extreme correction, but we're far from poles: %f" % change_ratio)
+                print(f"Warning: Vy has extreme correction, but we're far from poles: {change_ratio}")
         if self.crossed_the_pole:
             self.crossed_the_pole = False
             self.velocities[Y_INDEX] = old_vy  # don't correct speed if we've just skipped the pole

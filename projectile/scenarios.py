@@ -19,10 +19,10 @@ if not os.path.exists("scenario_data"):
 
 
 def init_scenario(name: str) -> (str, str, str, Stopwatch):  # create files and initialize Stopwatch
-    os.mkdir("scenario_data/{}/".format(name))
-    csvdir = "scenario_data/{}/csv/".format(name)
-    kmldir = "scenario_data/{}/kml/".format(name)
-    frcdir = "scenario_data/{}/forces/".format(name)
+    os.mkdir(f"scenario_data/{name}/")
+    csvdir = f"scenario_data/{name}/csv/"
+    kmldir = f"scenario_data/{name}/kml/"
+    frcdir = f"scenario_data/{name}/forces/"
     os.mkdir(csvdir)
     os.mkdir(kmldir)
     os.mkdir(frcdir)
@@ -43,7 +43,7 @@ def run(scenario: str, args=None) -> None:
         Launch long-distance flights to the east, varying the latitude, across the same meridian. Total 170 flights.
         :return: nothing
         """
-        print("Running {}".format(scenario))
+        print(f"Running {scenario}")
 
         def fuel_flow(t: float):  # this is not very realistic-see long_distance scenario for a better multi-engine sim
             if t < 1:
@@ -67,8 +67,8 @@ def run(scenario: str, args=None) -> None:
         def iteration(latitude: float):
             env = Environment(surface_altitude=lambda p: 80)
             thrust = ThrustForce(5000, fuel_flow, 150, 250000, 15, thrust_direction)
-            launcher = Launcher(math.pi / 4, 0, "%s%d.csv" % (csvdir, latitude), "%s%d" % (kmldir, latitude),
-                                "%s%d.csv" % (frcdir, latitude), environment=env, thrust=thrust)
+            launcher = Launcher(math.pi / 4, 0, f"{csvdir}{latitude}.csv", f"{kmldir}{latitude}",
+                                f"{frcdir}{latitude}.csv", environment=env, thrust=thrust)
             launcher.launch(10000, Position(math.radians(latitude), math.radians(45), 80))
             stopwatch.lap()
 
@@ -84,7 +84,7 @@ def run(scenario: str, args=None) -> None:
         Launch long-distance flights with pi/4 pitch with varying yaws. Total 71 flights.
         :return: nothing
         """
-        print("Running {}".format(scenario))
+        print(f"Running {scenario}")
 
         def fuel_flow(t: float):  # this is not very realistic-see long_distance scenario for a better multi-engine sim
             if t < 1:
@@ -108,8 +108,8 @@ def run(scenario: str, args=None) -> None:
 
             env = Environment(surface_altitude=lambda p: 80)
             thrust = ThrustForce(5000, fuel_flow, 150, 250000, 15, thrust_direction)
-            launcher = Launcher(math.pi / 4, math.radians(yaw), "%s%d.csv" % (csvdir, yaw), "%s%d" % (kmldir, yaw),
-                                "%s%d.csv" % (frcdir, yaw), environment=env, thrust=thrust)
+            launcher = Launcher(math.pi / 4, math.radians(yaw), f"{csvdir}{yaw}.csv", f"{kmldir}{yaw}",
+                                f"{frcdir}{yaw}.csv", environment=env, thrust=thrust)
             launcher.launch(10000, Position(math.radians(0), math.radians(15), 80))
             # compress("%s%d.csv" % (csvdir, yaw), "%s%d.bz2" % (csvdir, yaw), name_inside_zip="%d.csv" % yaw,
             #         keep_original=False)
@@ -127,7 +127,7 @@ def run(scenario: str, args=None) -> None:
         Launch long-distance flights to the east with varying pitches (8-82). Total 38 flights.
         :return: nothing
         """
-        print("Running {}".format(scenario))
+        print(f"Running {scenario}")
 
         def fuel_flow(t: float):  # this is not very realistic-see long_distance scenario for a better multi-engine sim
             if t < 1:
@@ -151,8 +151,8 @@ def run(scenario: str, args=None) -> None:
 
             env = Environment(surface_altitude=lambda p: 80)
             thrust = ThrustForce(5000, fuel_flow, 150, 250000, 15, thrust_direction)
-            launcher = Launcher(math.radians(pitch), 0, "%s%d.csv" % (csvdir, pitch), "%s%d" % (kmldir, pitch),
-                                "%s%d.csv" % (frcdir, pitch), environment=env, thrust=thrust)
+            launcher = Launcher(math.radians(pitch), 0, f"{csvdir}{pitch}.csv", f"{kmldir}{pitch}",
+                                f"{frcdir}{pitch}.csv", environment=env, thrust=thrust)
             launcher.launch(10000, Position(math.radians(45), math.radians(45), 80))
             stopwatch.lap()
 
@@ -163,7 +163,7 @@ def run(scenario: str, args=None) -> None:
         stopwatch.stop()
 
     def long_distance() -> None:
-        print("Running {}".format(scenario))
+        print(f"Running {scenario}")
 
         def thrust_direction(axis: int, force: float, pr: Projectile):
             if pr.time < 1:
@@ -183,18 +183,18 @@ def run(scenario: str, args=None) -> None:
                   ThrustForce(1800, lambda t: 150, 150, 200000, 13, thrust_direction),
                   ThrustForce(1200, lambda t: 200, 200, 300000, 15, thrust_direction),
                   ThrustForce(1200, lambda t: 200, 200, 300000, 15, thrust_direction)]
-        launcher = Launcher(math.pi/4, math.pi, "%sdata.csv" % csvdir, "%sdata" % kmldir,
-                            "%sdata.csv" % frcdir, environment=env, thrust=thrust)
+        launcher = Launcher(math.pi/4, math.pi, f"{csvdir}data.csv", f"{kmldir}data",
+                            f"{frcdir}data.csv", environment=env, thrust=thrust)
         launcher.launch(10000, Position(math.radians(10), math.radians(-10), 80))
         stopwatch.stop()
-        env.plot_all_forces("%sdata.csv" % frcdir)
+        env.plot_all_forces(f"{frcdir}data.csv")
 
     def test() -> None:
         """
         Test scenario. Default for fiddling around.
         :return: nothing
         """
-        print("Running {}".format(scenario))
+        print(f"Running {scenario}")
 
         def fuel_flow(t: float):
             if t < 1:
@@ -219,18 +219,18 @@ def run(scenario: str, args=None) -> None:
 
         env = Environment(surface_altitude=lambda p: 80)
         thrust = ThrustForce(3500, fuel_flow, 150, 200000, 12, thrust_direction)
-        launcher = Launcher(0.9, 0, "%stest.csv" % csvdir, "%stest" % kmldir,
-                            "%stest.csv" % frcdir, environment=env, thrust=thrust)
+        launcher = Launcher(0.9, 0, f"{csvdir}test.csv", f"{kmldir}test",
+                            f"{frcdir}test.csv", environment=env, thrust=thrust)
         launcher.launch(8000, Position(math.radians(60), math.radians(45), 80))
         stopwatch.stop()
-        env.plot_all_forces("%stest.csv" % frcdir)
+        env.plot_all_forces(f"{frcdir}test.csv")
 
     def pole_crossing() -> None:
         """
         Start really north. Cross the pole and carry on.
         :return: nothing
         """
-        print("Running {}".format(scenario))
+        print(f"Running {scenario}")
 
         def fuel_flow(t: float):
             if t < 1:
@@ -256,11 +256,11 @@ def run(scenario: str, args=None) -> None:
         env = Environment(surface_altitude=lambda p: 80)
         env.remove_force(CoriolisForce())
         thrust = ThrustForce(4000, fuel_flow, 150, 200000, 12, thrust_direction)
-        launcher = Launcher(math.pi/4, math.pi/2, "%stest.csv" % csvdir, "%stest" % kmldir,
-                            "%stest.csv" % frcdir, environment=env, thrust=thrust, dt=0.1)
+        launcher = Launcher(math.pi/4, math.pi/2, f"{csvdir}test.csv", f"{kmldir}test",
+                            f"{frcdir}test.csv", environment=env, thrust=thrust, dt=0.1)
         launcher.launch(8000, Position(math.radians(84), math.radians(-15), 80))
         stopwatch.stop()
-        env.plot_all_forces("%stest.csv" % frcdir)
+        env.plot_all_forces(f"{frcdir}test.csv")
 
     #
     locals()[scenario]()  # call the appropriate method

@@ -41,7 +41,7 @@ class KmlWriter:
         self.file.write("<?xml version='1.0' encoding='UTF-8'?>\n")
         self.file.write("<kml xmlns='http://earth.google.com/kml/2.2'>\n")
         self.file.write("<Document>\n")
-        self.file.write("   <name>{}</name>\n".format(name))
+        self.file.write(f"   <name>{name}</name>\n")
         self.write_styles()
 
     def write_styles(self):
@@ -57,7 +57,7 @@ class KmlWriter:
 
         if pretty:
             self.file.write("<Placemark>\n")
-            self.file.write("    <TimeSpan>\n        <begin>{}</begin>\n    </TimeSpan>\n".format(time.isoformat()))
+            self.file.write(f"    <TimeSpan>\n        <begin>{time.isoformat()}</begin>\n    </TimeSpan>\n")
             if self.fuel_band > data.z_speed > -self.fuel_band or (data.z_speed <= 0 and not self.wrote_peak):
                 self.file.write("    <styleUrl>#peak</styleUrl>\n")
                 self.wrote_peak = True
@@ -73,7 +73,7 @@ class KmlWriter:
             self.file.write("    </LineString>\n")
         else:
             self.file.write("<Placemark>")
-            self.file.write("<TimeSpan><begin>{}</begin></TimeSpan>".format(time.isoformat()))
+            self.file.write(f"<TimeSpan><begin>{time.isoformat()}</begin></TimeSpan>")
             if self.peak_band > data.z_speed > -self.peak_band or (data.z_speed <= 0 and not self.wrote_peak):
                 self.file.write("<styleUrl>#peak</styleUrl>")
                 self.wrote_peak = True
@@ -82,7 +82,7 @@ class KmlWriter:
                 self.wrote_fuel = True
             self.file.write("<LineString>")
             self.file.write("<extrude>1</extrude>")
-            self.file.write("<altitudeMode>{}</altitudeMode>".format(self.altitude_mode))
+            self.file.write(f"<altitudeMode>{self.altitude_mode}</altitudeMode>")
             self.file.write("<coordinates>{},{},{} {},{},{}</coordinates>"
                             .format(degrees(self.previous.longitude), degrees(self.previous.latitude),
                                     self.previous.altitude, degrees(data.longitude), degrees(data.latitude),

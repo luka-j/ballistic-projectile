@@ -38,7 +38,7 @@ class Environment:
             if type(f) == type(force):
                 self.forces.remove(f)
                 return
-        print("Non-existing force {}!".format(type(force).__name__))
+        print(f"Non-existing force {type(force).__name__}!")
 
     # noinspection PyPep8Naming
     def density(self, altitude: float) -> float:
@@ -72,8 +72,7 @@ class Environment:
         """
         intensities = np.zeros([len(self.forces), 3], "float128")
         if DEBUG:
-            print("Position: {}, {}, {}"
-                  .format(projectile.position.lat, projectile.position.lon, projectile.position.alt))
+            print(f"Position: {projectile.position.lat}, {projectile.position.lon}, {projectile.position.alt}")
         i = 0
         for force in self.forces:
             intensities[i] = np.array([force.get_x(projectile, self), force.get_y(projectile, self),

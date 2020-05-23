@@ -28,5 +28,5 @@ if __name__ == '__main__':
     elif sys.argv[1] == "kmz":
         convert_csv_to_kmz(sys.argv[2], sys.argv[2].rsplit(".", 2)[1])
     else:
-        print("Invalid command {}".format(sys.argv[1]))
+        print(f"Invalid command {sys.argv[1]}")
         exit(1)

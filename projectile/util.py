@@ -82,7 +82,7 @@ class RollingStatistic:
             elif newvar > 0:
                 self.variance = newvar
             if RollingStatistic.PRINT_DEBUG:
-                print("New sample: {}, Mean: {}, variance: {}".format(new, self.mean, self.variance))
+                print(f"New sample: {new}, Mean: {self.mean}, variance: {self.variance}")
             self.stddev = sqrt(self.variance)
             self.elements.append(new)
 
@@ -106,9 +106,9 @@ class Stopwatch:
         lap_time = time.time() - self.start_time
         self.total_time += lap_time
         self.lap_count += 1
-        print("Lap {}: {}, total: {}".format(self.lap_count, lap_time, self.total_time))
+        print(f"Lap {self.lap_count}: {lap_time}, total: {self.total_time}")
         self.start_time = time.time()
 
     def stop(self) -> None:
         self.total_time += (time.time() - self.start_time)
-        print("Execution finished. Total time: {}".format(self.total_time))
+        print(f"Execution finished. Total time: {self.total_time}")
